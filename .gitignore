@@ -1,0 +1,52 @@
+# Compiled class files
+*.class
+
+# Maven specific files
+target/
+!target/README.txt
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# VS Code specific files
+.vscode/
+.settings/
+.history/
+
+# IDE specific files
+.idea/
+*.iml
+*.hprof
+*.swp
+*.swo
+
+# Eclipse files
+.classpath
+.project
+
+# OS specific files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Maven wrapper
+.mvn/
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# Other files
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+
+# Environmental files
+.env
+.env.local

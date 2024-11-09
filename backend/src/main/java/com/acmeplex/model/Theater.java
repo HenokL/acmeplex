@@ -78,6 +78,15 @@ public class Theater {
         return name;
     }
 
+     /*
+     * Sets the name of the theater
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    
+
     /*
      * Gets the location of the theater
      */

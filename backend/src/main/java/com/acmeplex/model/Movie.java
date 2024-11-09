@@ -81,6 +81,13 @@ public class Movie {
     }
 
     /*
+     * Sets the ID value of the movie
+     */
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    /*
      * Gets the title of the movie
      */
     public String getTitle() {
@@ -88,10 +95,24 @@ public class Movie {
     }
 
     /*
+     * Sets the title of the movie
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /*
      * Gets the director of the movie
      */
     public String getDirector() {
         return director;
+    }
+
+    /*
+     * Sets the director of the movie
+     */
+    public void setDirector(String director) {
+        this.director = director;
     }
 
     /*
@@ -106,6 +127,13 @@ public class Movie {
      */
     public String getGenre() {
         return genre;
+    }
+
+    /*
+     * Sets the genre of the movie
+     */
+    public void setGenre(String genre) {
+        this.genre = genre;
     }
 
     /*

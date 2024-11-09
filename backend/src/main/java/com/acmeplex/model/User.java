@@ -111,15 +111,30 @@ public class User {
         return email;
     }
 
+    /*
+     * Sets the email  of the user
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     /*
      * Get boolean depending on if the user is registered or not
      * Returns True if the user is registered
      * Returns False if the user is not registered
      */
-    public boolean getIsRegistered() {
+    public boolean isRegistered() {
         return isRegistered;
     }
+
+    /*
+     * Sets the email  of the user
+     */
+    public void setIsRegistered(boolean registered) {
+        this.isRegistered = registered;
+    }
+
+
 
 
 };

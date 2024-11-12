@@ -47,7 +47,13 @@ coverage/
 *.tsbuildinfo
 
 # Configuration files
-*.properties
+backend/src/main/resources/application.yml
+backend/src/main/resources/*.properties
 
 
+# Ignore maven wrapper files
+# Maven wrapper files should not be ignored
+!.mvn/
+!mvnw
+!mvnw.cmd
 

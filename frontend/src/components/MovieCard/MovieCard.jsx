@@ -84,7 +84,7 @@ const MovieCard = () => {
 
     return (
         <div className="movie-section">
-            <h2>Now Playing</h2>
+            <h2>Movies</h2>
             <div className="movie-grid">
                 {moviesData.map((movie) => (
                     <div key={movie.id} className="movie-card">

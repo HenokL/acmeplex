@@ -41,12 +41,10 @@ CREATE TABLE IF NOT EXISTS RegisteredUser (
 CREATE TABLE IF NOT EXISTS Payment (
     paymentId INT AUTO_INCREMENT PRIMARY KEY,
     amount DOUBLE,
-    creditCardNumber INT,
+    creditCardNumber BIGINT,
     creditCardName VARCHAR(255),
     creditCardCV INT,
-    date DATE,
-    userId INT,
-    FOREIGN KEY (userId) REFERENCES RegisteredUser(userId)
+    paymentDate DATE,
 );
 
 -- Creates the Ticket table if it doesn't already exist

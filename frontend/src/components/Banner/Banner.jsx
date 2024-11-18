@@ -1,9 +1,14 @@
-
+/**
+ * Banner component - Displays rotating movie trailers with navigation controls
+ * Comment added by Henok L
+ */
 
 import React, { useState, useEffect } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import './Banner.css';
 
+// Movie content data with trailers and titles
+// I am using just moke movies and here and we can replace this with actual data from the backend
 const movieContent = [
     {
         trailer: "https://www.youtube.com/embed/U2Qp5pL3ovA?autoplay=1&mute=1&controls=0&loop=1&playlist=U2Qp5pL3ovA&showinfo=0&vq=hd1080",
@@ -52,11 +57,13 @@ const Banner = () => {
         setCurrentSlide(index);
     };
 
+    // Auto-rotation effect for slides
     useEffect(() => {
         const timer = setInterval(nextSlide, 7000);
         return () => clearInterval(timer);
     }, []);
 
+    // This part will just Render the banner component
     return (
         <div className="banner-container">
             <div className="banner">

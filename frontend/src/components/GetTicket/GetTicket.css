@@ -1,0 +1,19 @@
+.get-ticket-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 30px 0;
+  }
+  
+  .get-ticket-button {
+    background-color: #032541 !important;
+    color: white !important;
+    padding: 10px 50px !important;
+    font-size: 1rem !important;
+    text-transform: none !important;
+    transition: background-color 0.3s ease !important;
+  }
+  
+  .get-ticket-button:hover {
+    background-color: #145d6a !important;
+  }

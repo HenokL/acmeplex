@@ -67,4 +67,16 @@ INSERT INTO Ticket (email, price, status, purchaseDate, movieId, seatId, showtim
 ('frank.harris@example.com', 17.00, 'Booked', '2024-11-19', 1, 7, 6),
 ('grace.miller@example.com', 19.00, 'Booked', '2024-11-19', 2, 9, 6);
 
+-- Inserting into the Payment table
+INSERT INTO Payment (amount, creditCardNumber, creditCardName, creditCardCV, paymentDate) VALUES
+(100.50, 1234567890123456, 'John Doe', 123, '2024-11-16'),
+(250.75, 9876543210987654, 'Jane Smith', 456, '2024-11-15'),
+(150.00, 1122334455667788, 'Emily Johnson', 789, '2024-11-14'),
+(320.25, 2233445566778899, 'Michael Brown', 321, '2024-11-13'),
+(80.60, 3344556677889900, 'Sarah Davis', 654, '2024-11-12'),
+(200.40, 4455667788990011, 'David Wilson', 987, '2024-11-11'),
+(180.30, 5566778899001122, 'Olivia Moore', 432, '2024-11-10'),
+(120.90, 6677889900112233, 'James Taylor', 876, '2024-11-09'),
+(210.80, 7788990011223344, 'Sophia Lee', 543, '2024-11-08'),
+(99.99, 8899001122334455, 'Lucas Harris', 210, '2024-11-07');
 

@@ -1,0 +1,101 @@
+
+.tickets-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tickets-title {
+    text-align: center;
+    color: #032541;
+    margin-bottom: 2rem !important;
+  }
+  
+  .booking-form {
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .selection-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+  }
+  
+  .selection-icon {
+    color: #032541;
+    font-size: 2rem !important;
+  }
+  
+  .seats-section {
+    margin-top: 2rem;
+  }
+  
+  .screen {
+    background: #e0e0e0;
+    padding: 1rem;
+    margin: 2rem auto;
+    width: 80%;
+    border-radius: 4px;
+  }
+  
+  .seats-container {
+    margin: 2rem 0;
+  }
+  
+  .seat {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    transition: all 0.3s ease;
+  }
+  
+  .seat.available {
+    color: #032541;
+  }
+  
+  .seat.selected {
+    color: #01b4e4;
+  }
+  
+  .seat.occupied {
+    color: #666;
+    cursor: not-allowed;
+  }
+  
+  .seat:hover:not(.occupied) {
+    transform: scale(1.1);
+  }
+  
+  .seat-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 2rem 0;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .booking-summary {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  
+  .purchase-button {
+    margin-top: 1rem !important;
+    background-color: #032541 !important;
+    padding: 0.5rem 2rem !important;
+  }
+  
+  .purchase-button:hover {
+    background-color: #01b4e4 !important;
+  }
+
+  

@@ -1,9 +1,16 @@
+/**
+ * MovieCard component - This sectiong will Displays grid of movie cards with poster images and trailer modal
+ * on the home page
+ * Comment added by Henok L
+ */
 
 import React, { useState } from 'react';
 import { FaPlay } from 'react-icons/fa';
 import { IoMdClose } from 'react-icons/io';
 import './MovieCard.css';
 
+// I am using just moke movies and here and we can replace this with actual data from the backend
+// also we can add more data like movie description, rating, genre, etc.
 const moviesData = [
     {
         id: 1,
@@ -79,6 +86,7 @@ const moviesData = [
     }
 ];
 
+// Basicly this component will render the movie card with poster image and watch trailer button
 const MovieCard = () => {
     const [selectedTrailer, setSelectedTrailer] = useState(null);
 

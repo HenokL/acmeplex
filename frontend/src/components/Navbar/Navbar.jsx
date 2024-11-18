@@ -1,3 +1,8 @@
+/**
+ * Navbar component - This our Main navigation bar with text logo, links and login button
+ * Comment added by Henok L
+ */
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiLogIn } from 'react-icons/fi';

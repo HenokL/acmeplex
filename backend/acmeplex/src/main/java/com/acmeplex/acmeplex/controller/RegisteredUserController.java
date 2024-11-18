@@ -54,6 +54,4 @@ public class RegisteredUserController {
          // Return the saved user with HTTP status 201 (Created)
          return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
      }
-
-
 }

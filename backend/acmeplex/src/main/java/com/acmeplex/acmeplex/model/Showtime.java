@@ -9,6 +9,9 @@ import java.time.LocalTime;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
+import java.util.Date;
+
+
 
 @Entity
 @Table(name = "Showtime") // Use lowercase table name
@@ -23,6 +26,10 @@ public class Showtime {
     @JoinColumn(name = "movieId", referencedColumnName = "movieId", nullable = false) 
     private Movie movie;
 
+    // showtimeDate column
+    @Column(name = "showtimeDate")
+    private Date showtimeDate;
+
     @Column(name = "startTime", nullable = false)
     private String startTime;
 
@@ -34,8 +41,9 @@ public class Showtime {
     }
 
     // Parameterized Constructor
-    public Showtime(Movie movie, String startTime, String endTime) {
+    public Showtime(Movie movie, Date showtimeDate, String startTime, String endTime) {
         this.movie = movie;
+        this.showtimeDate = showtimeDate;
         this.startTime = startTime;
         this.endTime = endTime;
     }

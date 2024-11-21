@@ -36,6 +36,8 @@ const Tickets = () => {
   const [dates, setDates] = useState([]);
   const [times, setTimes] = useState([]);
   const [theaters, setTheatre] = useState(["Theater 1"]);
+  const [rows, setRows] = useState([]);
+  const [seatsPerRow, setSeatsPerRow] = useState({});
 
   const { data: movies, loading, error } = useApi("api/movies", "GET");
   const {
@@ -75,8 +77,8 @@ const Tickets = () => {
   const occupiedSeats = ["A2", "B4", "C3", "D1"];
   const ticketPrice = 15;
 
-  const rows = ["A", "B", "C", "D", "E"];
-  const seatsPerRow = 8;
+  // const rows = ["A", "B", "C", "D", "E"];
+  // const seatsPerRow = 8;
 
   // Handles seat selection and deselection logic
   const handleSeatSelect = (seatId) => {
@@ -118,15 +120,28 @@ const Tickets = () => {
 
   useEffect(() => {
     if (Array.isArray(showtimes)) {
-      const startDates = showtimes.map((showtime) => showtime.startTime);
+      const startDates = showtimes.map((showtime) => showtime.showtimeDate);
       const startTimes = showtimes.map((showtime) => showtime.startTime);
       setDates(startDates);
       setTimes(startTimes);
     }
   }, [showtimes]);
-  // useEffect(() => {
-  //   console.log(seats);
-  // }, [seats]);
+  useEffect(() => {
+    if (seats && Array.isArray(seats)) {
+      // Create dynamic rows based on seatRow
+      const seatRows = Array.from(
+        new Set(seats.map((seat) => seat.seatRow))
+      ).sort();
+      const seatsPerRow = seatRows.reduce((acc, row) => {
+        acc[row] = seats
+          .filter((seat) => seat.seatRow === row)
+          .map((seat) => seat.seatNumber);
+        return acc;
+      }, {});
+      setRows(seatRows);
+      setSeatsPerRow(seatsPerRow);
+    }
+  }, [seats]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="">{error}</div>;
@@ -230,18 +245,18 @@ const Tickets = () => {
               <Typography variant="h6" gutterBottom align="center">
                 Select Your Seats
               </Typography>
-
               <Box className="screen">
                 <Typography variant="body2" align="center">
                   Screen
                 </Typography>
               </Box>
-
               <Box className="seats-container">
                 {rows.map((row) => (
                   <Grid container key={row} justifyContent="center" spacing={1}>
-                    {[...Array(seatsPerRow)].map((_, index) => {
-                      const seatId = `${row}${index + 1}`;
+                    {seatsPerRow[row]?.map((seatNumber) => {
+                      const seatId = `${String.fromCharCode(
+                        64 + row
+                      )}${seatNumber}`;
                       return (
                         <Grid item key={seatId}>
                           <Box
@@ -257,7 +272,7 @@ const Tickets = () => {
                   </Grid>
                 ))}
               </Box>
-
+              ;
               <Box className="seat-legend">
                 <Box className="legend-item">
                   <Box className="seat available">
@@ -278,7 +293,6 @@ const Tickets = () => {
                   <Typography variant="caption">Occupied</Typography>
                 </Box>
               </Box>
-
               <Box className="booking-summary">
                 <Typography variant="subtitle1">
                   Selected Seats: {selectedSeats.join(", ")}

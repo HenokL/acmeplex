@@ -1,6 +1,7 @@
 package com.acmeplex.controller;
 import com.acmeplex.model.Receipt;
 import com.acmeplex.service.ReceiptService;
+import com.acmeplex.service.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,12 @@ public class ReceiptController {
 
     
     private final ReceiptService receiptService;
+    private final EmailService emailService;
 
     @Autowired
-    public ReceiptController(ReceiptService receiptService) {
+    public ReceiptController(ReceiptService receiptService, EmailService emailService) {
         this.receiptService = receiptService;
+        this.emailService = emailService;
     }
 
     // Get all receipts
@@ -67,17 +70,47 @@ public class ReceiptController {
 
     // Create a new receipt
     @PostMapping
-    public Receipt createReceipt(@RequestBody Receipt receiptRequest) {
+    public ResponseEntity<String> createReceipt(@RequestBody Receipt receiptRequest) {
+
+
 
         // Extract Payment ID and Ticket ID
         int paymentId = receiptRequest.getPayment().getPaymentId();
         int ticketId = receiptRequest.getTicket().getTicketId();
         
-        return receiptService.createReceipt(
-                receiptRequest.getEmail(),
-                paymentId,
-                ticketId
-        );
+        Receipt createdReceipt = null;
+        
+        try {
+            // Create the receipt
+            createdReceipt = receiptService.createReceipt(
+                    receiptRequest.getEmail(),
+                    paymentId,
+                    ticketId
+            );
+            
+            // Formatting the email content
+            String emailBody = "Dear Customer,\n\n" +
+                    "Thank you for your purchase! Here are the details of your receipt:\n\n" +
+                    "Receipt ID: " + createdReceipt.getReceiptId() + "\n" +
+                    "Payment ID: " + createdReceipt.getPayment().getPaymentId() + "\n" +
+                    "Ticket ID: " + createdReceipt.getTicket().getTicketId() + "\n" +
+                    "Movie: " + createdReceipt.getTicket().getMovie().getTitle() + "\n" + 
+                    "Seat Number: " + createdReceipt.getTicket().getSeat().getSeatNumber() + "\n" + 
+                    "Price: " + createdReceipt.getTicket().getPrice() + "\n" + 
+                    "Regards,\n" +
+                    "Acmeplex Support";
+            
+            // Send email to the customer
+            emailService.sendEmail(createdReceipt.getEmail(), "Your Receipt", emailBody);
+            
+            // Return success to the front end, with a message
+            return new ResponseEntity<>("Receipt created successfully and email sent!", HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            // Return failure message to the front end
+            return new ResponseEntity<>("Receipt creation failed, but email not sent: ", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
 }

@@ -1,11 +1,18 @@
 package com.acmeplex.controller;
+
 import com.acmeplex.model.Ticket;
+import com.acmeplex.model.Showtime;
 import com.acmeplex.service.TicketService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,12 +46,51 @@ public class TicketController {
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
-    // Delete a ticket
+    // Delete a ticket for an ordinary user
     @DeleteMapping("/{ticketId}")
     public ResponseEntity<String> deleteTicket(@PathVariable int ticketId) {
+
+        // Fetching the ticket
+        Ticket ticket = ticketService.getTicketById(ticketId);
+        
+        // Check if the ticket is found
+        if (ticket == null) {
+            return new ResponseEntity<>("Ticket not found", HttpStatus.NOT_FOUND);
+        }
+
+        // Getting the showtime
+        Showtime showtime = ticket.getShowtime();
+
+        // Getting the Date of the showtime
+        java.sql.Date sqlShowtimeDate = showtime.getShowtimeDate();
+
+         // Convert java.sql.Date to java.time.LocalDate
+        LocalDate showtimeDate = sqlShowtimeDate.toLocalDate(); 
+
+        // Getting the start time of the showtime
+        String startTimeString = showtime.getStartTime();
+        LocalTime showtimeStartTime = LocalTime.parse(startTimeString);
+
+         // Combine the date and time into a full LocalDateTime
+        LocalDateTime showtimeStart = LocalDateTime.of(showtimeDate, showtimeStartTime);
+
+        // Getting the current time
+        LocalDateTime now = LocalDateTime.now();
+
+        // Calculating the time difference between now and the showtime
+        Duration duration = Duration.between(now, showtimeStart);
+
+        // Check if the difference is less or equal to 72 hours
+        if (duration.toHours() <= 72) {
+            return new ResponseEntity<>("Cannot cancel ticket within 72 hours of the showtime", HttpStatus.BAD_REQUEST);
+        }
+
+        // Proceed to delete the ticket if it is within the cancelable time frame
         ticketService.deleteTicket(ticketId);
         return new ResponseEntity<>("Ticket deleted successfully", HttpStatus.OK);
     }
+
+
 
     // Create a new ticket
     @PostMapping("/book")

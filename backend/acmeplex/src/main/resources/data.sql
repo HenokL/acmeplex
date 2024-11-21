@@ -36,6 +36,12 @@ INSERT INTO RegisteredUser (name, email, password) VALUES
 ('Sophia Lee', 'sophia.lee@example.com', 'securepassword789'),
 ('Lucas Harris', 'lucas.harris@example.com', 'qwertyuiop');
 
+-- Inserting into the Showtime table
+INSERT INTO Showtime (movieId, startTime, endTime, showtimeDate) VALUES
+(1, '14:00:00', '16:30:00', '2024-11-20'),
+(5, '17:00:00', '19:45:00', '2024-11-20'),
+(10, '20:00:00', '22:15:00', '2024-11-20');
+
 -- Inserting into the Seat table
 INSERT INTO Seat (seatNumber, seatRow, showtimeId) VALUES
 (1, 1, 1),
@@ -49,11 +55,6 @@ INSERT INTO Seat (seatNumber, seatRow, showtimeId) VALUES
 (9, 5, 1),
 (10, 5, 1);
 
--- Inserting into the Showtime table
-INSERT INTO Showtime (movieId, startTime, endTime) VALUES
-(1, '14:00:00', '16:30:00'),
-(5, '17:00:00', '19:45:00'),
-(10, '20:00:00', '22:15:00');
 
 
 -- Inserting into the Ticket Table

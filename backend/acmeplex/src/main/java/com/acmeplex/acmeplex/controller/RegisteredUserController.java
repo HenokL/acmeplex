@@ -1,9 +1,13 @@
 package com.acmeplex.controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.acmeplex.model.RegisteredUser;
 import com.acmeplex.service.RegisteredUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Optional;
 import java.util.HashMap;
@@ -48,11 +52,18 @@ public class RegisteredUserController {
 
      // Store a new registered user
      @PostMapping("/users")
-     public ResponseEntity<RegisteredUser> createUser(@RequestBody RegisteredUser user) {
-         RegisteredUser savedUser = registeredUserService.saveUser(user);
-
-         // Return the saved user with HTTP status 201 (Created)
-         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+     public ResponseEntity<?> createUser(@RequestBody RegisteredUser user) {
+         try {
+             // Attempt to save the user
+             RegisteredUser savedUser = registeredUserService.saveUser(user);
+     
+             // Return the saved user with HTTP status 201 (Created)
+             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+     
+         } catch (Exception ex) {
+             // Handle all exceptions and return a simple error message
+             return new ResponseEntity<>("Duplicate Email Try Again", HttpStatus.BAD_REQUEST);
+         }
      }
      
      //  Login in a user

@@ -27,6 +27,11 @@ public class RegisteredUserService {
         return registeredUserRepository.save(user);
     }
 
+     // Method to check if the email is registered
+     public boolean isEmailRegistered(String email) {
+        return registeredUserRepository.existsByEmail(email);
+    }
+
 
 
 }

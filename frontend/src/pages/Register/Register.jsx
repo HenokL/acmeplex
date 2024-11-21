@@ -1,6 +1,9 @@
 /**
- * Register page - Handles user registration with form validation
- * Comment added by Henok L
+ * Register Page - Handles user registration with form validation.
+ * Users can create a new account by providing their details.
+ * Redirects to the home page upon successful registration.
+ *
+ * Written by: Henok Lamiso and Yousef Fatouraee
  */
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -9,16 +12,17 @@ import "./Register.css";
 import { useApi } from "../../hooks/useApi";
 
 const Register = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook to navigate programmatically
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-  });
-  const [error, setError] = useState("");
-  const [apiErrorMessage, setApiErrorMessage] = useState("");
+  }); // Form data state
+  const [error, setError] = useState(""); // Client-side validation error state
+  const [apiErrorMessage, setApiErrorMessage] = useState(""); // API error message state
 
+  // API hook for registration functionality
   const {
     data,
     loading,
@@ -27,18 +31,33 @@ const Register = () => {
     fetchData: register,
   } = useApi("api/users", "POST");
 
+  /**
+   * Handles input changes for the form fields.
+   * Updates the corresponding field in the `formData` state.
+   * Resets error messages on user interaction.
+   *
+   * @param {Event} e - The input change event.
+   */
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.value, // Dynamically update based on input name
     });
-    setError("");
-    setApiErrorMessage("");
+    setError(""); // Reset client-side errors
+    setApiErrorMessage(""); // Reset API errors
   };
 
+  /**
+   * Handles form submission for registration.
+   * Validates inputs and calls the registration API.
+   * Displays errors or redirects to the home page upon success.
+   *
+   * @param {Event} e - The form submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Basic validation
     if (
       !formData.name ||
       !formData.email ||
@@ -64,7 +83,8 @@ const Register = () => {
     setApiErrorMessage("");
 
     try {
-      await register({
+      // Call the registration API
+      const { result, status, error } = await register({
         headers: {
           "Content-Type": "application/json",
         },
@@ -75,25 +95,23 @@ const Register = () => {
         },
       });
 
-      // Successful registration
-      if (responseStatus === 201) {
-        if (data) {
-          // Store user information in localStorage
-          localStorage.setItem("email", data.email || "");
-          localStorage.setItem("name", data.name || "");
-          localStorage.setItem("userId", data.userId || "");
-          navigate("/"); // Redirect to home page
+      if (status === 201) {
+        if (result) {
+          // Store user details in localStorage
+          localStorage.setItem("email", result.email || "");
+          localStorage.setItem("name", result.name || "");
+          localStorage.setItem("userId", result.userId || "");
+
+          // Redirect to the home page
+          navigate("/");
         } else {
           console.warn("No data returned by the API.");
         }
       } else {
-        // Handle errors from the server
-        setApiErrorMessage(
-          apiError || "An error occurred during registration."
-        );
+        setApiErrorMessage(error || "An error occurred during registration.");
       }
-    } catch (error) {
-      console.error("Error during registration:", error);
+    } catch (err) {
+      console.error("Error during registration:", err);
       setApiErrorMessage("An unexpected error occurred. Please try again.");
     }
   };
@@ -107,7 +125,9 @@ const Register = () => {
             Join ACMEPLEX to unlock exclusive benefits
           </p>
 
+          {/* Registration Form */}
           <form onSubmit={handleSubmit}>
+            {/* Full Name Field */}
             <div className="form-group">
               <label htmlFor="name">Full Name</label>
               <input
@@ -121,6 +141,7 @@ const Register = () => {
               />
             </div>
 
+            {/* Email Field */}
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
@@ -134,6 +155,7 @@ const Register = () => {
               />
             </div>
 
+            {/* Password Field */}
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
@@ -147,6 +169,7 @@ const Register = () => {
               />
             </div>
 
+            {/* Confirm Password Field */}
             <div className="form-group">
               <label htmlFor="confirmPassword">Confirm Password</label>
               <input
@@ -160,20 +183,23 @@ const Register = () => {
               />
             </div>
 
+            {/* Error Messages */}
             {error && <span className="error-message">{error}</span>}
             {apiErrorMessage && (
               <span className="error-message">{apiErrorMessage}</span>
             )}
 
+            {/* Submit Button */}
             <button
               type="submit"
               className="register-button"
               disabled={loading}
             >
-              Create Account
+              {loading ? "Registering..." : "Create Account"}
             </button>
           </form>
 
+          {/* Login Redirect */}
           <div className="form-footer">
             <div className="login-prompt">
               <p>Already have an account?</p>

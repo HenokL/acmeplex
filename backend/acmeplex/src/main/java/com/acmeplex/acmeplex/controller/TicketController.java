@@ -46,9 +46,9 @@ public class TicketController {
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
-    // Delete a ticket for an ordinary user
-    @DeleteMapping("/{ticketId}")
-    public ResponseEntity<String> deleteTicket(@PathVariable int ticketId) {
+    // Cancelling a ticket for an ordinary user
+    @PutMapping("/cancel/{ticketId}")
+    public ResponseEntity<String> cancelTicket(@PathVariable int ticketId, @RequestBody Map<String, String> request) {
 
         // Fetching the ticket
         Ticket ticket = ticketService.getTicketById(ticketId);
@@ -56,6 +56,11 @@ public class TicketController {
         // Check if the ticket is found
         if (ticket == null) {
             return new ResponseEntity<>("Ticket not found", HttpStatus.NOT_FOUND);
+        }
+
+          // Check if the ticket is already cancelled
+        if (ticket.getStatus().equals("Cancelled")) {
+            return new ResponseEntity<>("Ticket is already cancelled", HttpStatus.BAD_REQUEST);
         }
 
         // Getting the showtime
@@ -85,8 +90,14 @@ public class TicketController {
             return new ResponseEntity<>("Cannot cancel ticket within 72 hours of the showtime", HttpStatus.BAD_REQUEST);
         }
 
-        // Proceed to delete the ticket if it is within the cancelable time frame
-        ticketService.deleteTicket(ticketId);
+        // Get email from request body
+        String email = request.get("email");
+
+        // Check if the email is registered
+
+        // Proceed to cancel the ticket if it is within the cancelable time frame
+        ticketService.cancelTicket(ticketId, email);
+        
         return new ResponseEntity<>("Ticket deleted successfully", HttpStatus.OK);
     }
 
@@ -106,5 +117,5 @@ public class TicketController {
 
         // Return a success message with HTTP status 201 (Created)
         return new ResponseEntity<>("Ticket booked successfully", HttpStatus.CREATED);
-      }
+    }
 }

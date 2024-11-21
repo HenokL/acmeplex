@@ -1,65 +1,73 @@
+/**
+ * Login Page - Handles user authentication with form validation.
+ * Allows users to log in by providing their username and password.
+ * Redirects authenticated users to the home page.
+ * Written by: Henok Lamiso and Yousef Fatouraee
+ */
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
-import { useApi } from "../../hooks/useApi"; // Make sure useApi hook is imported
+import { useApi } from "../../hooks/useApi";
 import "./Login.css";
 
 const Login = () => {
   const navigate = useNavigate(); // Hook to navigate programmatically
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [username, setUsername] = useState(""); // Username state
+  const [password, setPassword] = useState(""); // Password state
+  const [error, setError] = useState(""); // Error message state
+
+  // API hook for login functionality
   const {
     data,
     loading,
     error: apiError,
     responseStatus,
     fetchData: login,
-  } = useApi("api/login", "POST"); // Adjust this to match your API
+  } = useApi("api/login", "POST");
 
+  /**
+   * Handles form submission for user login.
+   * Validates input fields and calls the login API.
+   * Redirects users on successful login or displays error messages.
+   * @param {Event} e - The form submit event.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear the error message at the start of the submission
+    setError(""); // Reset any existing error message
 
+    // Validate inputs
     if (!username || !password) {
       setError("Please fill in all fields");
       return;
     }
 
     try {
-      // Perform login API request
-      await login({
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: {
-          email: username,
-          password,
-        },
+      // Call the login API
+      const { result, status, error } = await login({
+        headers: { "Content-Type": "application/json" },
+        body: { email: username, password },
       });
 
-      // Handle success response (assuming response contains user data)
-      if (responseStatus === 200) {
-        if (data) {
-          // Store user data in localStorage
-          localStorage.setItem("userId", data.userId || "");
+      // Handle response based on status
+      if (status === 200) {
+        if (result) {
+          // Save user data to localStorage
+          localStorage.setItem("userId", result.userId || "");
           localStorage.setItem("email", username || "");
-          localStorage.setItem("name", data.name || "");
+          localStorage.setItem("name", result.name || "");
 
-          // Redirect to home page
+          // Redirect to the home page
           navigate("/");
         } else {
           console.warn("No data returned by the API.");
         }
-      } else if (responseStatus === 404) {
-        // Handle error if user not found
+      } else if (status === 404) {
         setError("Invalid credentials, please try again.");
       } else {
-        setError(apiError || "Please try again later!");
+        setError(error || "Please try again later!");
       }
-    } catch (error) {
-      // Handle network or unexpected errors
-      console.error("Error during login:", error);
+    } catch (err) {
+      console.error("Error during login:", err);
       setError(
         "An unexpected error occurred. Please check your network connection and try again."
       );
@@ -73,6 +81,10 @@ const Login = () => {
           <h1>Hello!</h1>
           <p className="form-description">Sign in to continue to ACMEPLEX</p>
 
+<<<<<<< HEAD
+=======
+          {/* Login Form */}
+>>>>>>> 16a4448e445787b541db4a63e6a7c168ffb8b632
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="username">Username</label>
@@ -82,7 +94,7 @@ const Login = () => {
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);
-                  setError(""); // Reset error on input change
+                  setError(""); // Clear error on input change
                 }}
                 placeholder="Enter your username"
                 className="form-input"
@@ -97,20 +109,23 @@ const Login = () => {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  setError(""); // Reset error on input change
+                  setError(""); // Clear error on input change
                 }}
                 placeholder="Enter your password"
                 className="form-input"
               />
             </div>
 
+            {/* Display error messages */}
             {error && <span className="error-message">{error}</span>}
 
+            {/* Submit button */}
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? "Loading..." : "Sign In"}
             </button>
           </form>
 
+          {/* Redirect to registration page */}
           <div className="form-footer">
             <div className="signup-prompt">
               <p>New to ACMEPLEX?</p>

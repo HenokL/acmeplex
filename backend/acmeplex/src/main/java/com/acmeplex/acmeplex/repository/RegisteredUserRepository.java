@@ -13,4 +13,9 @@ public interface RegisteredUserRepository extends JpaRepository<RegisteredUser, 
 
     // Finds registered user by email
     Optional<RegisteredUser> findByEmail(String email);
+
+    // Check if an email exists
+    boolean existsByEmail(String email);
+
+
 }

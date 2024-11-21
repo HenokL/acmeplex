@@ -12,12 +12,13 @@ CREATE TABLE IF NOT EXISTS Movie (
 );
 
 -- Creates the Showtime table if it doesn't already exist
+  
 CREATE TABLE IF NOT EXISTS Showtime (
     showtimeId INT AUTO_INCREMENT PRIMARY KEY,
     movieId INT NOT NULL, 
     startTime VARCHAR(255) NOT NULL,
     endTime VARCHAR(255) NOT NULL, 
-    showtimeData Date NOT NULL,
+    showtimeDate Date NOT NULL, 
     FOREIGN KEY (movieId) REFERENCES Movie(movieId)
 );
 

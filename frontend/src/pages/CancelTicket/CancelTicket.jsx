@@ -3,151 +3,114 @@
  * Comment added by Henok L
  */
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaTicketAlt, FaCheckCircle } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
-import Footer from "../../components/Footer/Footer";
-import { useApi } from "../../hooks/useApi"; // Import the useApi hook
-import "./CancelTicket.css";
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaTicketAlt, FaCheckCircle } from 'react-icons/fa';
+import { MdEmail } from 'react-icons/md';
+import Footer from '../../components/Footer/Footer';
+import './CancelTicket.css';
 
 const CancelTicket = () => {
-  const [ticketNumber, setTicketNumber] = useState("");
-  const [email, setEmail] = useState("");
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const {
-    data,
-    loading,
-    error: apiError,
-    responseStatus,
-    fetchData: cancel,
-  } = useApi(ticketNumber && `api/tickets/${ticketNumber}`, "DELETE");
+    const [ticketNumber, setTicketNumber] = useState('');
+    const [email, setEmail] = useState('');
+    const [showConfirmation, setShowConfirmation] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
-  // Handles the initial form submission and validation
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (ticketNumber && email) {
-      setShowConfirmation(true); // Show confirmation modal
-    }
-  };
+    // This will Handles the initial form submission and validation
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (ticketNumber && email) {
+            setShowConfirmation(true);
+        }
+    };
 
-  // Processes ticket cancellation and shows success message
-  const handleConfirm = async () => {
-    setShowConfirmation(false); // Close the confirmation modal
-    try {
-      // Perform the API request to cancel the ticket
-      await cancel({
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: {
-          email, // Send email for verification (if needed by API)
-        },
-      });
-
-      // Check the response status and handle success
-      if (responseStatus === 200) {
-        setIsSuccess(true); // Show success message
+    // Processes ticket cancellation and shows success message
+    const handleConfirm = () => {
+        setShowConfirmation(false);
+        setIsSuccess(true);
         setTimeout(() => {
-          setIsSuccess(false); // Hide success message after a delay
-          setTicketNumber("");
-          setEmail("");
+            setIsSuccess(false);
+            setTicketNumber('');
+            setEmail('');
         }, 3000);
-      } else {
-        // Handle any API error response
-        console.error("Error cancelling ticket:", apiError || "Unknown error");
-        alert(apiError || "Failed to cancel the ticket. Please try again.");
-      }
-    } catch (error) {
-      // Handle unexpected errors
-      console.error("Error during ticket cancellation:", error);
-      alert("An unexpected error occurred. Please try again.");
-    }
-  };
+    };
 
-  // Renders the cancel ticket form
-  return (
-    <>
-      <div className="cancel-page-container">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="cancel-ticket-container"
-        >
-          <h2>Cancel Your Ticket</h2>
-
-          <form onSubmit={handleSubmit} className="cancel-form">
-            <div className="form-group">
-              <FaTicketAlt className="input-icon" />
-              <input
-                type="text"
-                value={ticketNumber}
-                onChange={(e) => setTicketNumber(e.target.value)}
-                placeholder="Enter Ticket Number"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <MdEmail className="input-icon" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter Email Address"
-                required
-              />
-            </div>
-
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? "Processing..." : "Cancel Ticket"}
-            </button>
-          </form>
-
-          <AnimatePresence>
-            {isSuccess && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5 }}
-                className="success-message"
-              >
-                <FaCheckCircle />
-                <p>Ticket Cancelled Successfully!</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-
-        {showConfirmation && (
-          <div className="confirmation-modal">
-            <motion.div
-              initial={{ scale: 0.5 }}
-              animate={{ scale: 1 }}
-              className="modal-content"
-            >
-              <h3>Confirm Cancellation</h3>
-              <p>Are you sure you want to cancel this ticket?</p>
-              <p className="ticket-info">Ticket Number: {ticketNumber}</p>
-              <div className="modal-buttons">
-                <button onClick={handleConfirm} className="confirm-btn">
-                  Yes, Cancel
-                </button>
-                <button
-                  onClick={() => setShowConfirmation(false)}
-                  className="cancel-btn"
+    // This part will Render the cancel ticket form
+    return (
+        <>
+            <div className="cancel-page-container">
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="cancel-ticket-container"
                 >
-                  No, Keep Ticket
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </div>
-      <Footer />
-    </>
-  );
+                    <h2>Cancel Your Ticket</h2>
+                    
+                    <form onSubmit={handleSubmit} className="cancel-form">
+                        <div className="form-group">
+                            <FaTicketAlt className="input-icon" />
+                            <input
+                                type="text"
+                                value={ticketNumber}
+                                onChange={(e) => setTicketNumber(e.target.value)}
+                                placeholder="Enter Ticket Number"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <MdEmail className="input-icon" />
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="Enter Email Address"
+                                required
+                            />
+                        </div>
+
+                        <button type="submit" className="submit-btn">
+                            Cancel Ticket
+                        </button>
+                    </form>
+
+                    <AnimatePresence>
+                        {isSuccess && (
+                            <motion.div 
+                                initial={{ opacity: 0, scale: 0.5 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.5 }}
+                                className="success-message"
+                            >
+                                <FaCheckCircle />
+                                <p>Ticket Cancelled Successfully!</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+
+                {showConfirmation && (
+                    <div className="confirmation-modal">
+                        <motion.div 
+                            initial={{ scale: 0.5 }}
+                            animate={{ scale: 1 }}
+                            className="modal-content"
+                        >
+                            <h3>Confirm Cancellation</h3>
+                            <p>Are you sure you want to cancel this ticket?</p>
+                            <p className="ticket-info">Ticket Number: {ticketNumber}</p>
+                            <div className="modal-buttons">
+                                <button onClick={handleConfirm} className="confirm-btn">Yes, Cancel</button>
+                                <button onClick={() => setShowConfirmation(false)} className="cancel-btn">No, Keep Ticket</button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </div>
+            <Footer />
+        </>
+    );
 };
 
 export default CancelTicket;
+

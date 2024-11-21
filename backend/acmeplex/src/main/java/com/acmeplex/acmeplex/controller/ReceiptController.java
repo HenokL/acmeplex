@@ -94,6 +94,9 @@ public class ReceiptController {
                     "Receipt ID: " + createdReceipt.getReceiptId() + "\n" +
                     "Payment ID: " + createdReceipt.getPayment().getPaymentId() + "\n" +
                     "Ticket ID: " + createdReceipt.getTicket().getTicketId() + "\n" +
+                    "Movie: " + createdReceipt.getTicket().getMovie().getTitle() + "\n" + 
+                    "Seat Number: " + createdReceipt.getTicket().getSeat().getSeatNumber() + "\n" + 
+                    "Price: " + createdReceipt.getTicket().getPrice() + "\n" + 
                     "Regards,\n" +
                     "Acmeplex Support";
             

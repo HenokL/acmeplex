@@ -60,6 +60,11 @@ public class RegisteredUser {
         this.password = password;
     }
 
+    // Get users ID
+    public int getUserId() {
+        return this.userId;
+    }
+
     /*
      * Retrieves users name
      */

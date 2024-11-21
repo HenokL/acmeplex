@@ -50,8 +50,39 @@ public class RegisteredUserController {
      @PostMapping("/users")
      public ResponseEntity<RegisteredUser> createUser(@RequestBody RegisteredUser user) {
          RegisteredUser savedUser = registeredUserService.saveUser(user);
-         
+
          // Return the saved user with HTTP status 201 (Created)
          return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
      }
+     
+     //  Login in a user
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, String> loginDetails) {
+        String email = loginDetails.get("email");
+        String password = loginDetails.get("password");
+
+        // Fetch user by email
+        Optional<RegisteredUser> userOpt = registeredUserService.getUserByEmail(email);
+
+        if (userOpt.isPresent()) {
+            RegisteredUser user = userOpt.get();
+
+            // Check if the password matches (assuming passwords are stored in plain text, for demo purposes)
+            if (user.getPassword().equals(password)) {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Login successful");
+                response.put("userId", String.valueOf(user.getUserId())); // Assuming the user has an ID field
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Invalid password");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "User not found");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+    }
+    
 }

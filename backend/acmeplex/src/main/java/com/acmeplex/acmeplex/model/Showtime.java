@@ -28,7 +28,7 @@ public class Showtime {
 
     // showtimeDate column
     @Column(name = "showtimeDate")
-    private Date showtimeDate;
+    private java.sql.Date showtimeDate;
 
     @Column(name = "startTime", nullable = false)
     private String startTime;
@@ -41,7 +41,7 @@ public class Showtime {
     }
 
     // Parameterized Constructor
-    public Showtime(Movie movie, Date showtimeDate, String startTime, String endTime) {
+    public Showtime(Movie movie, java.sql.Date showtimeDate, String startTime, String endTime) {
         this.movie = movie;
         this.showtimeDate = showtimeDate;
         this.startTime = startTime;
@@ -79,5 +79,13 @@ public class Showtime {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public void setShowtimeDate(java.sql.Date showtimeDate) {
+        this.showtimeDate = showtimeDate;
+    }
+
+    public java.sql.Date getShowtimeDate() {
+        return this.showtimeDate;
     }
 }

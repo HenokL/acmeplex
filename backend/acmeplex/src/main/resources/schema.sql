@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS Showtime (
     movieId INT NOT NULL, 
     startTime VARCHAR(255) NOT NULL,
     endTime VARCHAR(255) NOT NULL, 
+    showtimeData Date NOT NULL,
     FOREIGN KEY (movieId) REFERENCES Movie(movieId)
 );
 

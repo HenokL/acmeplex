@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 
 export const useApi = (endpoint, method = "GET", options = {}) => {
   // Base URL setup
-  const URL = process.env.NEXT_PUBLIC_BACK_END_URL || "http://localhost";
-  const PORT = process.env.NEXT_PUBLIC_BACK_END_PORT || "8080";
+  const URL = process.env.BACK_END_URL || "http://localhost";
+  const PORT = process.env.BACK_END_PORT || "8080";
 
   const [data, setData] = useState(null); // State to store API response data
   const [loading, setLoading] = useState(false); // State to manage loading status
@@ -13,30 +13,36 @@ export const useApi = (endpoint, method = "GET", options = {}) => {
 
   // Function to fetch data from the API
   const fetchData = async (fetchOptions = {}) => {
-    if (!endpoint) return;
+    if (!endpoint) return null;
     try {
       setLoading(true);
       const response = await fetch(`${URL}:${PORT}/${endpoint}`, {
         method, // HTTP method (GET, POST, etc.)
         headers: {
           "Content-Type": "application/json",
-          ...fetchOptions.headers, // Use headers from fetchOptions if provided
+          ...fetchOptions.headers,
         },
         body: method !== "GET" ? JSON.stringify(fetchOptions.body) : null, // Request body if method is not GET
       });
 
       setResponseStatus(response.status);
 
+      const result = response.ok ? await response.json() : null;
+
       if (!response.ok) {
-        throw new Error(`Failed to fetch: ${response.statusText}`);
+        throw new Error(
+          result?.message || response.statusText || "Request failed"
+        );
       }
 
-      const result = await response.json();
       setData(result);
       setError(null);
+
+      return { result, status: response.status }; // Return data and status
     } catch (err) {
       setError(err.message);
       setData(null);
+      return { error: err.message, status: responseStatus || 500 };
     } finally {
       setLoading(false);
     }

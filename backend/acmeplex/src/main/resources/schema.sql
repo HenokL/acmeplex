@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS Ticket (
     FOREIGN KEY (seatId) REFERENCES Seat(seatId),
     FOREIGN KEY (showtimeId) REFERENCES Showtime(showtimeId)
 );
-
+ 
 -- Creates the Receipt table if it doesn't already exist
 CREATE TABLE IF NOT EXISTS Receipt (
     receiptId INT AUTO_INCREMENT PRIMARY KEY,

@@ -81,10 +81,7 @@ const Login = () => {
           <h1>Hello!</h1>
           <p className="form-description">Sign in to continue to ACMEPLEX</p>
 
-<<<<<<< HEAD
-=======
           {/* Login Form */}
->>>>>>> 16a4448e445787b541db4a63e6a7c168ffb8b632
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="username">Username</label>

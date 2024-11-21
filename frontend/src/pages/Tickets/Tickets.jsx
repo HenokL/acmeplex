@@ -39,8 +39,6 @@ const Tickets = () => {
   const [dates, setDates] = useState([]);
   const [times, setTimes] = useState([]);
   const [theaters, setTheatre] = useState(["Theater 1"]);
-  const [rows, setRows] = useState([]);
-  const [seatsPerRow, setSeatsPerRow] = useState({});
 
   const { data: movies, loading, error } = useApi("api/movies", "GET");
   const {

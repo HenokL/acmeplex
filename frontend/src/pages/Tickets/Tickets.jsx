@@ -1,6 +1,9 @@
 /**
- * Tickets page - Handles movie ticket booking with seat selection
- * Comment added by Henok L
+ * Tickets Page
+ * This component handles movie ticket booking with options for seat selection, date, time, theater, and movie.
+ * Users can view available seats, select them, and proceed to payment.
+ *
+ * Written by: Henok Lamiso and Yousef Fatouraee
  */
 
 import React, { useEffect, useState } from "react";
@@ -50,7 +53,7 @@ const Tickets = () => {
     "GET"
   );
   const {
-    data: seats,
+    data: occupiedSeats,
     loading: seatsLoading,
     error: seatsError,
   } = useApi(
@@ -63,24 +66,16 @@ const Tickets = () => {
       }`,
     "GET"
   );
-  // const dates = showtimes?.[0] || null;
-  // I am using some Mock data for selections here and this will be replaced with actual data from the backend
-  // Comment added by Henok L
-  // const dates = ["2024-11-20", "2024-11-21", "2024-11-22"];
-  // const theaters = ["Theater 1"];
 
-  // const times = ["10:00 AM", "1:30 PM", "4:00 PM", "7:30 PM", "10:00 PM"];
-
-  // NOTE For Yousef: Here I just put some Mock occupied seats
-  const occupiedSeats = ["A2", "B4", "C3", "D1"];
   const ticketPrice = 15;
 
+  // Define rows and seats per row
   const rows = ["A", "B", "C", "D", "E"];
   const seatsPerRow = 8;
 
   // Handles seat selection and deselection logic
   const handleSeatSelect = (seatId) => {
-    if (occupiedSeats.includes(seatId)) return;
+    if (occupiedSeats?.includes(seatId)) return;
 
     setSelectedSeats((prev) =>
       prev.includes(seatId)
@@ -91,7 +86,7 @@ const Tickets = () => {
 
   // Determines seat color based on its status
   const getSeatColor = (seatId) => {
-    if (occupiedSeats.includes(seatId)) return "occupied";
+    if (occupiedSeats?.includes(seatId)) return "occupied";
     if (selectedSeats.includes(seatId)) return "selected";
     return "available";
   };
@@ -113,23 +108,23 @@ const Tickets = () => {
       seats: selectedSeats,
       total: selectedSeats.length * ticketPrice,
     };
+    console.log(ticketData);
+
     navigate("/payment", { state: { ticketData } });
   };
-
+  // Set available times and dates
   useEffect(() => {
     if (Array.isArray(showtimes)) {
-      const startDates = showtimes.map((showtime) => showtime.startTime);
+      const startDates = showtimes.map((showtime) => showtime.showtimeDate);
       const startTimes = showtimes.map((showtime) => showtime.startTime);
       setDates(startDates);
       setTimes(startTimes);
     }
   }, [showtimes]);
-  // useEffect(() => {
-  //   console.log(seats);
-  // }, [seats]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div className="">{error}</div>;
+
   return (
     <div className="tickets-page">
       <Container maxWidth="md" sx={{ my: 4 }}>
@@ -172,13 +167,11 @@ const Tickets = () => {
                 <MenuItem value="" disabled>
                   Choose a date
                 </MenuItem>
-                {dates &&
-                  dates.length > 0 &&
-                  dates.map((date) => (
-                    <MenuItem key={date} value={date}>
-                      {date}
-                    </MenuItem>
-                  ))}
+                {dates.map((date) => (
+                  <MenuItem key={date} value={date}>
+                    {date}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>
@@ -230,23 +223,31 @@ const Tickets = () => {
               <Typography variant="h6" gutterBottom align="center">
                 Select Your Seats
               </Typography>
-
               <Box className="screen">
                 <Typography variant="body2" align="center">
                   Screen
                 </Typography>
               </Box>
-
               <Box className="seats-container">
-                {rows.map((row) => (
+                {rows.map((row, rowIndex) => (
                   <Grid container key={row} justifyContent="center" spacing={1}>
-                    {[...Array(seatsPerRow)].map((_, index) => {
-                      const seatId = `${row}${index + 1}`;
+                    {Array.from({ length: seatsPerRow }, (_, seatIndex) => {
+                      const seatId = `${row}${seatIndex + 1}`;
+                      const isOccupied = occupiedSeats?.some(
+                        (seat) =>
+                          seat.seatRow === rowIndex + 1 &&
+                          seat.seatNumber === seatIndex + 1
+                      );
+
                       return (
                         <Grid item key={seatId}>
                           <Box
-                            className={`seat ${getSeatColor(seatId)}`}
-                            onClick={() => handleSeatSelect(seatId)}
+                            className={`seat ${
+                              isOccupied ? "occupied" : getSeatColor(seatId)
+                            }`}
+                            onClick={() =>
+                              !isOccupied && handleSeatSelect(seatId)
+                            }
                           >
                             <WeekendOutlined />
                             <Typography variant="caption">{seatId}</Typography>
@@ -257,7 +258,6 @@ const Tickets = () => {
                   </Grid>
                 ))}
               </Box>
-
               <Box className="seat-legend">
                 <Box className="legend-item">
                   <Box className="seat available">
@@ -278,7 +278,6 @@ const Tickets = () => {
                   <Typography variant="caption">Occupied</Typography>
                 </Box>
               </Box>
-
               <Box className="booking-summary">
                 <Typography variant="subtitle1">
                   Selected Seats: {selectedSeats.join(", ")}

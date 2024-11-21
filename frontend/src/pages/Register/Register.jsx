@@ -2,14 +2,14 @@
  * Register page - Handles user registration with form validation
  * Comment added by Henok L
  */
-
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import Footer from "../../components/Footer/Footer";
 import "./Register.css";
 import { useApi } from "../../hooks/useApi";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,18 +17,23 @@ const Register = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
+  const [apiErrorMessage, setApiErrorMessage] = useState("");
 
   const {
-    fetchData: register,
+    data,
+    loading,
     error: apiError,
     responseStatus,
+    fetchData: register,
   } = useApi("api/users", "POST");
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
     setError("");
+    setApiErrorMessage("");
   };
 
   const handleSubmit = async (e) => {
@@ -54,10 +59,9 @@ const Register = () => {
       return;
     }
 
-    // console.log("Registration attempt:", {
-    //   name: formData.name,
-    //   email: formData.email,
-    // });
+    // Reset error messages
+    setError("");
+    setApiErrorMessage("");
 
     try {
       await register({
@@ -70,12 +74,27 @@ const Register = () => {
           password: formData.password,
         },
       });
-      if (responseStatus >= 200 && responseStatus < 300) {
-        console.log("success");
-        // router.push(`/dashboard/${userId}`);
+
+      // Successful registration
+      if (responseStatus === 201) {
+        if (data) {
+          // Store user information in localStorage
+          localStorage.setItem("email", data.email || "");
+          localStorage.setItem("name", data.name || "");
+          localStorage.setItem("userId", data.userId || "");
+          navigate("/"); // Redirect to home page
+        } else {
+          console.warn("No data returned by the API.");
+        }
+      } else {
+        // Handle errors from the server
+        setApiErrorMessage(
+          apiError || "An error occurred during registration."
+        );
       }
     } catch (error) {
-      console.error(error);
+      console.error("Error during registration:", error);
+      setApiErrorMessage("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -142,8 +161,15 @@ const Register = () => {
             </div>
 
             {error && <span className="error-message">{error}</span>}
+            {apiErrorMessage && (
+              <span className="error-message">{apiErrorMessage}</span>
+            )}
 
-            <button type="submit" className="register-button">
+            <button
+              type="submit"
+              className="register-button"
+              disabled={loading}
+            >
               Create Account
             </button>
           </form>

@@ -181,6 +181,4 @@ public class TicketController {
             return new ResponseEntity<>("Error processing the booking: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
 }

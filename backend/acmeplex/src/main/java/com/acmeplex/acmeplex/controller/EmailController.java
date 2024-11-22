@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class EmailController {
 
-    private final EmailService emailService;  // Using constructor-based injection
+    private final EmailService emailService; 
 
     // Constructor-based dependency injection
     public EmailController(EmailService emailService) {

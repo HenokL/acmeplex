@@ -26,7 +26,7 @@ public class MovieController {
     public ResponseEntity<List<MovieDTO>> getAllMovies() {
          // Get all movies from the service
          List<MovieDTO> movies = movieService.getAllMovies();
-         
+
         // Return the list of movies with HTTP status 200 (OK)
         return ResponseEntity.ok(movies); 
     }

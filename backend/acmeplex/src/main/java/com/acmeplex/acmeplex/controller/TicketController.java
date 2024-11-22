@@ -89,26 +89,24 @@ public class TicketController {
         // Convert java.sql.Date to java.time.LocalDate
         LocalDate showtimeDate = sqlShowtimeDate.toLocalDate();
 
-        // Getting the start time of the showtime
-        String startTimeString = showtime.getStartTime();
-        LocalTime showtimeStartTime = LocalTime.parse(startTimeString);
+        // Getting the current date
+        LocalDate now = LocalDate.now();
 
-        // Combine the date and time into a full LocalDateTime
-        LocalDateTime showtimeStart = LocalDateTime.of(showtimeDate, showtimeStartTime);
+        // Calculate the number of days between now and the showtime
+        long daysBetween = Duration.between(now.atStartOfDay(), showtimeDate.atStartOfDay()).toDays();
 
-        // Getting the current time
-        LocalDateTime now = LocalDateTime.now();
-
-        // Calculating the time difference between now and the showtime
-        Duration duration = Duration.between(now, showtimeStart);
-
-        // Check if the difference is less or equal to 72 hours
-        if (duration.toHours() <= 72) {
-            return new ResponseEntity<>("Cannot cancel ticket within 72 hours of the showtime", HttpStatus.BAD_REQUEST);
+        // Check if the difference is less than or equal to 3 days
+        if (daysBetween <= 3) {
+            return new ResponseEntity<>("Cannot cancel ticket within 3 days of the showtime", HttpStatus.BAD_REQUEST);
         }
-
         // Get email from request body
         String email = request.get("email");
+
+         // Validate email with the one stored in the ticket
+        if (!email.equals(ticket.getEmail())) {
+            return new ResponseEntity<>("Email does not match the ticket record", HttpStatus.UNAUTHORIZED);
+        }
+
 
         // Check if the email is registered
 

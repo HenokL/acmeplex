@@ -49,14 +49,6 @@ public class Movie {
     @Column(name = "genre", length = 50) 
     private String genre;
 
-    /*
-     * moviePoster column
-     * Can not be null
-     * 
-     */
-    @Column(name = "posterURL", length = 255, nullable = false)
-    private String posterURL;
-
     // All of the movie's showtimes
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL)
     private List<Showtime> showtimes;
@@ -71,11 +63,10 @@ public class Movie {
     /*
      * Parameterized constructor
      */
-    public Movie(String title, double duration, String genre, String posterURL) {
+    public Movie(String title, double duration, String genre) {
         this.title = title;
         this.duration = duration;
         this.genre = genre;
-        this.posterURL = posterURL;
     }
 
     /*
@@ -134,22 +125,6 @@ public class Movie {
     public void setGenre(String genre) {
         this.genre = genre;
     }
-
-    /*
-     * Gets the poster url
-     */
-    public String getPosterURL() {
-        return this.posterURL;
-    }
-
-    /*
-     * Sets the poster url
-     */
-    public void setPosterURL(String posterURL) {
-        this.posterURL = posterURL;
-
-    }
-
      
     /*
      * Override toString for better object representation

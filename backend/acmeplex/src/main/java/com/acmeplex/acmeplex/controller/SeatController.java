@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+import java.util.ArrayList;
 import java.util.stream.Collectors; 
 
 
@@ -50,33 +52,49 @@ public class SeatController {
         }
     }
     
-    // Book a seat for a showtime
+    // Book a seat for a showtime@PostMapping("/book")
     @PostMapping("/book")
-    public ResponseEntity<String> bookSeat(@RequestBody Seat seatRequest) {
-        // Retrieve the showtime by ID
-        int showtimeId = seatRequest.getShowtime().getShowtimeId(); 
+    public ResponseEntity<String> bookSeats(@RequestBody Map<String, Object> request) {
+        // Extract the showtimeId from the request
+        int showtimeId = (int) request.get("showtimeId");
 
+        // Fetch the showtime by ID
         Optional<Showtime> optionalShowtime = showtimeService.getShowtimeById(showtimeId);
         if (!optionalShowtime.isPresent()) {
-            // If showtime does not exist, return NOT_FOUND response
             return new ResponseEntity<>("Showtime not found", HttpStatus.NOT_FOUND);
         }
 
         Showtime showtime = optionalShowtime.get();
 
-        // Check if this seat has already been booked for this showtime
-        Optional<Seat> existingSeat = seatService.getSeatByNumberAndShowtime(seatRequest.getSeatNumber(), showtime);
-        if (existingSeat.isPresent()) {
-            // If the seat exists, it means it's already booked
-            return new ResponseEntity<>("Seat is already booked", HttpStatus.BAD_REQUEST);
+        // Extract the seats array from the request
+        List<Map<String, Object>> seatsRequest = (List<Map<String, Object>>) request.get("seats");
+
+        // List to store booked seats
+        List<Seat> bookedSeats = new ArrayList<>();
+
+        // Check if any of the seats are already booked
+        for (Map<String, Object> seatData : seatsRequest) {
+            int seatNumber = (int) seatData.get("seatNumber");
+            int seatRow = (int) seatData.get("seatRow");
+
+            // Check if the seat is already booked for the given showtime
+            Optional<Seat> existingSeat = seatService.getSeatByNumberAndShowtime(seatNumber, showtime);
+            if (existingSeat.isPresent()) {
+                // If any seat is already booked, return a bad request response without saving any seat
+                return new ResponseEntity<>("Seat " + seatNumber + " in row " + seatRow + " is already booked", HttpStatus.BAD_REQUEST);
+            }
+
+            // Otherwise, create a new seat object to book
+            Seat bookedSeat = new Seat(seatNumber, seatRow, showtime);
+            bookedSeats.add(bookedSeat);
         }
 
-        // Save the seat as booked by associating it with the showtime
-        Seat bookedSeat = new Seat(seatRequest.getSeatNumber(), seatRequest.getSeatRow(), showtime);
-        seatService.saveSeat(bookedSeat);
+        // If no seats were found to be booked, proceed with saving all seats
+        for (Seat bookedSeat : bookedSeats) {
+            seatService.saveSeat(bookedSeat);
+        }
 
         // Return success message with status CREATED
-        return new ResponseEntity<>("Seat booked successfully", HttpStatus.CREATED);
+        return new ResponseEntity<>("Seats booked successfully", HttpStatus.CREATED);
     }
-
 }

@@ -26,6 +26,9 @@ public class ReceiptService {
     @Autowired
     private TicketRepository ticketRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     // Get all receipts
     public List<Receipt> getAllReceipts() {
         return receiptRepository.findAll();
@@ -51,6 +54,24 @@ public class ReceiptService {
         return receiptRepository.findByTicket_TicketId(ticketId);
     }
 
+
+    // Sends the receipt via email
+    public void sendReceiptEmail(Receipt receipt) {
+        String emailBody = "Dear Customer,\n\n" +
+                "Thank you for your purchase! Here are the details of your receipt:\n\n" +
+                "Receipt ID: " + receipt.getReceiptId() + "\n" +
+                "Payment ID: " + receipt.getPayment().getPaymentId() + "\n" +
+                "Ticket ID: " + receipt.getTicket().getTicketId() + "\n" +
+                "Movie: " + receipt.getTicket().getMovie().getTitle() + "\n" +
+                "Seat Number: " + receipt.getTicket().getSeat().getSeatNumber() + "\n" +
+                "Price: " + receipt.getTicket().getPrice() + "\n\n" +
+                "Regards,\n" +
+                "Acmeplex Support";
+
+        emailService.sendEmail(receipt.getEmail(), "Your Receipt", emailBody);
+    }
+
+
     // Create reciept
     public Receipt createReceipt(String email, int paymentId, int ticketId) {
         // Fetch the Payment and Ticket based on their IDs
@@ -67,7 +88,12 @@ public class ReceiptService {
         receipt.setTicket(ticket);
 
         // Save the new Receipt to the database
-        return receiptRepository.save(receipt);
+        Receipt savedReceipt = receiptRepository.save(receipt);
+
+        // Sending out the Receipt Via email
+        sendReceiptEmail(savedReceipt);
+
+        return savedReceipt;
     }
     
 }

@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS Payment (
     creditCardNumber BIGINT,
     creditCardName VARCHAR(255),
     creditCardCV INT,
-    paymentDate DATE,
+    paymentDate DATE
 );
 
 -- Creates the Ticket table if it doesn't already exist
@@ -72,4 +72,12 @@ CREATE TABLE IF NOT EXISTS Receipt (
     ticketId INT,
     FOREIGN KEY (paymentId) REFERENCES Payment(paymentId),
     FOREIGN KEY (ticketId) REFERENCES Ticket(ticketId)
+);
+
+-- Creates the credit table if it doesn't already exist
+CREATE TABLE IF NOT EXISTS CREDIT (
+    creditID INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    creditAmount DOUBLE DEFAULT 0
+    issuedDate Date NOT NULL
 );

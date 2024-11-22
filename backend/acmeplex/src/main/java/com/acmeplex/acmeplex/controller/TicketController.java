@@ -2,7 +2,14 @@ package com.acmeplex.controller;
 
 import com.acmeplex.model.Ticket;
 import com.acmeplex.model.Showtime;
+import com.acmeplex.model.Payment;
+import com.acmeplex.model.Seat;
+import com.acmeplex.model.Receipt;
 import com.acmeplex.service.TicketService;
+import com.acmeplex.service.ShowtimeService;
+import com.acmeplex.service.PaymentService;
+import com.acmeplex.service.SeatService;
+import com.acmeplex.service.ReceiptService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,21 +18,31 @@ import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/tickets")
 public class TicketController {
 
-    
     private final TicketService ticketService;
+    private final ShowtimeService showtimeService;
+    private final PaymentService paymentService;
+    private final SeatService seatService;
+    private final ReceiptService receiptService;
+
+
+
 
     // Constructor-based dependency injection
-    public TicketController(TicketService ticketService) {
+    public TicketController(TicketService ticketService, ShowtimeService showtimeService, PaymentService paymentService, SeatService seatService, ReceiptService receiptService) {
         this.ticketService = ticketService;
+        this.showtimeService = showtimeService;
+        this.paymentService = paymentService;
+        this.seatService = seatService;
+        this.receiptService = receiptService;
     }
 
     // Get ticket by its ID
@@ -52,13 +69,13 @@ public class TicketController {
 
         // Fetching the ticket
         Ticket ticket = ticketService.getTicketById(ticketId);
-        
+
         // Check if the ticket is found
         if (ticket == null) {
             return new ResponseEntity<>("Ticket not found", HttpStatus.NOT_FOUND);
         }
 
-          // Check if the ticket is already cancelled
+        // Check if the ticket is already cancelled
         if (ticket.getStatus().equals("Cancelled")) {
             return new ResponseEntity<>("Ticket is already cancelled", HttpStatus.BAD_REQUEST);
         }
@@ -69,14 +86,14 @@ public class TicketController {
         // Getting the Date of the showtime
         java.sql.Date sqlShowtimeDate = showtime.getShowtimeDate();
 
-         // Convert java.sql.Date to java.time.LocalDate
-        LocalDate showtimeDate = sqlShowtimeDate.toLocalDate(); 
+        // Convert java.sql.Date to java.time.LocalDate
+        LocalDate showtimeDate = sqlShowtimeDate.toLocalDate();
 
         // Getting the start time of the showtime
         String startTimeString = showtime.getStartTime();
         LocalTime showtimeStartTime = LocalTime.parse(startTimeString);
 
-         // Combine the date and time into a full LocalDateTime
+        // Combine the date and time into a full LocalDateTime
         LocalDateTime showtimeStart = LocalDateTime.of(showtimeDate, showtimeStartTime);
 
         // Getting the current time
@@ -97,25 +114,54 @@ public class TicketController {
 
         // Proceed to cancel the ticket if it is within the cancelable time frame
         ticketService.cancelTicket(ticketId, email);
-        
+
         return new ResponseEntity<>("Ticket deleted successfully", HttpStatus.OK);
     }
 
-
-
-    // Create a new ticket
+    /*
+     * Creates a new Ticket and payment
+     * The new Ticket and new Payment together form the Reciept
+     */
     @PostMapping("/book")
-    public ResponseEntity<String> bookTicket(@RequestBody Ticket ticketRequest) {
+    public ResponseEntity<String> bookTicket(@RequestBody Map<String, Object> request) {
+        try {
+            // Extract showtimeId, seat info, and payment details from the request
+            int showtimeId = (int) request.get("showtimeId");
+            int seatNumber = (int) request.get("seatNumber");
+            int seatRow = (int) request.get("seatRow");
+            int seatId = (int) request.get("seatId");
+            double price = (double) request.get("price");
+            long creditCardNumber = (long) request.get("creditCardNumber");
+            String creditCardName = (String) request.get("creditCardName");
+            int creditCardCV = (int) request.get("creditCardCV");
+            String email = (String) request.get("email");
 
-        // Extract ID from movie, seat and showtime
-        int movieId = ticketRequest.getMovie().getMovieId();
-        int seatId = ticketRequest.getSeat().getSeatId();
-        int showtimeId = ticketRequest.getShowtime().getShowtimeId();
+            // Retreive showtime and movieID
+            Showtime showtime = showtimeService.getShowtimeById(showtimeId)
+                    .orElseThrow(() -> new RuntimeException("Showtime not found for ID " + showtimeId));
+            int movieId = showtime.getMovie().getMovieId();  // Get movieId from Showtime
+            
 
-        // Save the ticket (this could also include checking if the seat is available)
-        Ticket bookedTicket = ticketService.saveTicket(movieId, seatId, showtimeId);
+        
+            // Create the payment
+            Payment payment = paymentService.createPayment(price, creditCardNumber, creditCardName, creditCardCV);
 
-        // Return a success message with HTTP status 201 (Created)
-        return new ResponseEntity<>("Ticket booked successfully", HttpStatus.CREATED);
+            // Book the ticket
+            Ticket bookedTicket = ticketService.saveTicket(movieId, seatId, showtimeId);
+                
+            // Save the receipt to the database
+            Receipt receipt = receiptService.createReceipt(email, payment.getPaymentId(), bookedTicket.getTicketId());
+
+            // Step 4: Send receipt email (using receiptService)
+            receiptService.sendReceiptEmail(receipt);
+
+            // Return success message
+            return new ResponseEntity<>("Ticket booked and receipt created successfully", HttpStatus.CREATED);
+
+
+            } catch (Exception e) {
+                // Handle errors (e.g., payment failure, booking failure)
+                return new ResponseEntity<>("Error processing the booking", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
     }
 }

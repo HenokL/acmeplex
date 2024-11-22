@@ -1,6 +1,7 @@
 package com.acmeplex.controller;
 import com.acmeplex.model.Movie;
 import com.acmeplex.service.MovieService;
+import com.acmeplex.dto.MovieDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,9 @@ public class MovieController {
 
     // Retrieves a list of all movies
     @GetMapping("/movies")
-    public ResponseEntity<List<Movie>> getAllMovies() {
+    public ResponseEntity<List<MovieDTO>> getAllMovies() {
          // Get all movies from the service
-         List<Movie> movies = movieService.getAllMovies();
+         List<MovieDTO> movies = movieService.getAllMovies();
          
         // Return the list of movies with HTTP status 200 (OK)
         return ResponseEntity.ok(movies); 
@@ -33,14 +34,27 @@ public class MovieController {
     // Retrieves information about a specific movie
     @GetMapping("/movies/{id}")
     public ResponseEntity<Movie> getMovieById(@PathVariable("id") int id) {
-        Optional<Movie> movie = movieService.getMovieById(id); 
+        Optional<Movie> movie = movieService.getMovieById(id);
 
         if (movie.isPresent()) {
             // Return the movie with OK if found
-            return new ResponseEntity<>(movie.get(), HttpStatus.OK);  
+            return new ResponseEntity<>(movie.get(), HttpStatus.OK);
         } else {
             //  Return 404 not found if the movie does not exist
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);  
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }    
+    }
+    
+    // Retrieves a list of upcoming movies
+    // Retrieves a list of all movies
+    @GetMapping("/upcoming/movies")
+    public ResponseEntity<List<MovieDTO>> getUpcomingMovies() {
+
+         // Get all upcoming movies
+         List<MovieDTO> upcomingMovies = movieService.getUpcomingMovies();
+         
+        // Return the list of movies with HTTP status 200 (OK)
+        return ResponseEntity.ok(upcomingMovies); 
+    }
+
 }

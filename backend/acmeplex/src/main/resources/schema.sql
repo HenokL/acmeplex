@@ -96,9 +96,6 @@ CREATE TABLE IF NOT EXISTS Credit (
     issuedDate Date NOT NULL
 );
 
-
--- Insertion
--- Script to insert into the Database tables
 INSERT INTO Movie (title, duration, genre) VALUES
 ('Inception', 2.5, 'Sci-Fi'),
 ('The Dark Knight', 2.75, 'Action'),
@@ -119,7 +116,17 @@ INSERT INTO Movie (title, duration, genre) VALUES
 ('Pulp Fiction', 2.6, 'Crime'),
 ('Forrest Gump', 2.2, 'Drama'),
 ('Gladiator', 2.5, 'Action'),
-('Braveheart', 2.8, 'History');
+('Braveheart', 2.8, 'History'),
+('Dune', 2.6, 'Sci-Fi'),
+('The Avengers', 2.8, 'Action'),
+('The Grand Budapest Hotel', 1.9, 'Comedy'),
+('The Revenant', 2.5, 'Drama'),
+('Mad Max: Fury Road', 2.0, 'Action'),
+('The Shining', 2.3, 'Horror'),
+('The Social Network', 2.1, 'Drama'),
+('The Matrix Reloaded', 2.5, 'Sci-Fi'),
+('La La Land', 2.0, 'Musical'),
+('Inglourious Basterds', 2.3, 'War');
 
 -- Insert data into the Showtime table
 INSERT INTO Showtime (movieId, startTime, endTime, showtimeDate) VALUES
@@ -130,7 +137,17 @@ INSERT INTO Showtime (movieId, startTime, endTime, showtimeDate) VALUES
 (15, '12:00:00', '14:30:00', '2024-11-24'),
 (8, '16:00:00', '18:00:00', '2024-11-25'),
 (14, '19:00:00', '21:30:00', '2024-11-26'),
-(18, '21:00:00', '23:30:00', '2024-11-27');
+(18, '21:00:00', '23:30:00', '2024-11-27'),
+(21, '14:00:00', '16:30:00', '2025-05-20'),
+(22, '17:00:00', '19:45:00', '2025-05-21'),
+(23, '20:00:00', '22:00:00', '2025-05-22'),
+(24, '09:00:00', '11:30:00', '2025-05-23'),
+(25, '12:00:00', '14:00:00', '2025-05-24'),
+(26, '16:00:00', '18:00:00', '2025-05-25'),
+(27, '19:00:00', '21:30:00', '2025-05-26'),
+(28, '21:00:00', '23:30:00', '2025-05-27'),
+(29, '14:00:00', '16:30:00', '2025-06-01'),
+(30, '17:00:00', '19:30:00', '2025-06-02');
 
 -- Insert data into the RegisteredUser table
 INSERT INTO RegisteredUser (name, email, password) VALUES
@@ -150,56 +167,37 @@ INSERT INTO Payment (amount, creditCardNumber, creditCardName, creditCardCV, pay
 (100.50, 1234567890123456, 'John Doe', 123, '2024-11-16'),
 (250.75, 9876543210987654, 'Jane Smith', 456, '2024-11-15'),
 (150.00, 1122334455667788, 'Emily Johnson', 789, '2024-11-14'),
-(320.25, 2233445566778899, 'Michael Brown', 321, '2024-11-13'),
-(80.60, 3344556677889900, 'Sarah Davis', 654, '2024-11-12'),
-(200.40, 4455667788990011, 'David Wilson', 987, '2024-11-11'),
-(180.30, 5566778899001122, 'Olivia Moore', 432, '2024-11-10'),
-(120.90, 6677889900112233, 'James Taylor', 876, '2024-11-09'),
-(210.80, 7788990011223344, 'Sophia Lee', 543, '2024-11-08'),
-(99.99, 8899001122334455, 'Lucas Harris', 210, '2024-11-07');
+(320.25, 2233445566778899, 'Michael Brown', 101, '2024-11-13'),
+(200.50, 3344556677889900, 'Sarah Davis', 202, '2024-11-12');
 
--- Insert data into the Credit table
-INSERT INTO Credit (email, creditAmount, issuedDate) VALUES
-('john.doe@example.com', 50.00, '2024-11-01'),
-('jane.smith@example.com', 120.00, '2024-11-02'),
-('emily.johnson@example.com', 200.00, '2024-11-03'),
-('michael.brown@example.com', 150.00, '2024-11-04'),
-('sarah.davis@example.com', 80.00, '2024-11-05'),
-('david.wilson@example.com', 300.00, '2024-11-06'),
-('olivia.moore@example.com', 250.00, '2024-11-07'),
-('james.taylor@example.com', 180.00, '2024-11-08'),
-('sophia.lee@example.com', 220.00, '2024-11-09'),
-('lucas.harris@example.com', 130.00, '2024-11-10');
-
--- Insert data into the Ticket table (including seatId)
+-- Insert data into the Ticket table
 INSERT INTO Ticket (email, price, status, purchaseDate, movieId, showtimeId) VALUES
-('john.doe@example.com', 15.50, 'Booked', '2024-11-16', 1, 3),
-('alice.jones@example.com', 18.00, 'Booked', '2024-11-16', 2, 3),
-('bob.smith@example.com', 20.00, 'Cancelled', '2024-11-17', 1, 4),
-('charlie.brown@example.com', 12.00, 'Booked', '2024-11-17', 3, 5),
-('david.white@example.com', 16.50, 'Booked', '2024-11-18', 2, 4),
-('eva.green@example.com', 14.00, 'Booked', '2024-11-18', 3, 5),
-('frank.harris@example.com', 17.00, 'Booked', '2024-11-19', 1, 6),
-('grace.miller@example.com', 19.00, 'Booked', '2024-11-19', 2, 6),
-('lucas.harris@example.com', 22.00, 'Booked', '2024-11-20', 3, 7),
-('emily.johnson@example.com', 20.00, 'Booked', '2024-11-21', 4, 7);
+('john.doe@example.com', 10.0, 'Booked', '2024-11-20', 1, 1),
+('jane.smith@example.com', 15.0, 'Booked', '2024-11-21', 5, 2),
+('emily.johnson@example.com', 12.0, 'Booked', '2024-11-22', 10, 3),
+('michael.brown@example.com', 18.0, 'Booked', '2024-11-23', 12, 4),
+('sarah.davis@example.com', 14.0, 'Booked', '2024-11-24', 15, 5);
 
 -- Insert data into the Seat table
 INSERT INTO Seat (seatNumber, seatRow, showtimeId, ticketId) VALUES
-(1, 1, 3, 1),  
-(2, 1, 3, 2),
-(3, 2, 3, 2), 
-(4, 2, 3, 2),
-(5, 3, 3, 1), 
-(6, 3, 3, 3), 
-(7, 4, 3, 1), 
-(8, 4, 3, 2), 
-(9, 5, 3, 2),  
-(10, 5, 3, 1), 
-(11, 1, 4, 3), 
-(12, 1, 4, 4), 
-(13, 2, 4, 4), 
-(14, 2, 4, 4),  
-(15, 3, 4, 5),  
-(16, 3, 4, 5),  
-(17, 4, 4, 5);
+(1, 1, 1, 1),
+(2, 1, 2, 2),
+(3, 1, 3, 3),
+(4, 1, 4, 4),
+(5, 1, 5, 5);
+
+-- Insert data into the Receipt table
+INSERT INTO Receipt (email, paymentId, ticketId) VALUES
+('john.doe@example.com', 1, 1),
+('jane.smith@example.com', 2, 2),
+('emily.johnson@example.com', 3, 3),
+('michael.brown@example.com', 4, 4),
+('sarah.davis@example.com', 5, 5);
+
+-- Insert data into the Credit table
+INSERT INTO Credit (email, creditAmount, issuedDate) VALUES
+('john.doe@example.com', 100.0, '2024-11-10'),
+('jane.smith@example.com', 200.0, '2024-11-11'),
+('emily.johnson@example.com', 150.0, '2024-11-12'),
+('michael.brown@example.com', 300.0, '2024-11-13'),
+('sarah.davis@example.com', 250.0, '2024-11-14');

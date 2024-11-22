@@ -125,6 +125,13 @@ public class Movie {
     public void setGenre(String genre) {
         this.genre = genre;
     }
+
+    /*
+     * Returns the list of showtimes for the movie
+     */
+    public List<Showtime> getShowtimes() {
+        return showtimes;
+    }
      
     /*
      * Override toString for better object representation

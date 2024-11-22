@@ -121,7 +121,7 @@ public class TicketController {
      * The new Ticket and new Payment together form the Reciept
      */
     @PostMapping("/book")
-    public ResponseEntity<String> bookTicket(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<?> bookTicket(@RequestBody Map<String, Object> request) {
         try {
             // Extract showtimeId, seat info, and payment details from the request
             int showtimeId = (int) request.get("showtimeId");
@@ -154,7 +154,7 @@ public class TicketController {
             receiptService.sendReceiptEmail(receipt);
 
             // Return success message
-            return new ResponseEntity<>("Ticket booked and receipt created successfully", HttpStatus.CREATED);
+            return new ResponseEntity<>(bookedTicket.getTicketId(), HttpStatus.CREATED);
 
 
             } catch (Exception e) {

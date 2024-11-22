@@ -1,8 +1,7 @@
 /**
  * CancelTicket page which Handles ticket cancellation process with confirmation
- * Comment added by Henok L
+ * Written by: Henok Lamiso and Yousef Fatouraee
  */
-
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTicketAlt, FaCheckCircle } from "react-icons/fa";
@@ -16,53 +15,41 @@ const CancelTicket = () => {
   const [email, setEmail] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const {
-    data,
-    loading,
-    error: apiError,
-    responseStatus,
-    fetchData: cancel,
-  } = useApi(ticketNumber && `api/tickets/${ticketNumber}`, "DELETE");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const { fetchData, loading, error } = useApi(
+    `api/tickets/cancel/${ticketNumber}`,
+    "PUT"
+  );
 
   // Handles the initial form submission and validation
   const handleSubmit = (e) => {
     e.preventDefault();
     if (ticketNumber && email) {
+      setErrorMessage(""); // Clear previous errors
       setShowConfirmation(true); // Show confirmation modal
+    } else {
+      setErrorMessage("Both Ticket Number and Email are required."); // Validation error
     }
   };
 
   // Processes ticket cancellation and shows success message
   const handleConfirm = async () => {
     setShowConfirmation(false); // Close the confirmation modal
-    try {
-      // Perform the API request to cancel the ticket
-      await cancel({
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: {
-          email, // Send email for verification (if needed by API)
-        },
-      });
 
-      // Check the response status and handle success
-      if (responseStatus === 200) {
-        setIsSuccess(true); // Show success message
-        setTimeout(() => {
-          setIsSuccess(false); // Hide success message after a delay
-          setTicketNumber("");
-          setEmail("");
-        }, 3000);
-      } else {
-        // Handle any API error response
-        console.error("Error cancelling ticket:", apiError || "Unknown error");
-        alert(apiError || "Failed to cancel the ticket. Please try again.");
-      }
-    } catch (error) {
-      // Handle unexpected errors
-      console.error("Error during ticket cancellation:", error);
-      alert("An unexpected error occurred. Please try again.");
+    const response = await fetchData({
+      headers: { "Content-Type": "application/json" },
+      body: { email }, // Request body
+    });
+
+    if (response?.result) {
+      // If successful response
+      setIsSuccess(true);
+      setErrorMessage(""); // Clear any error message
+    } else if (response?.error) {
+      // If an error occurs
+      setErrorMessage(response.error); // Show the backend message
+      setIsSuccess(false);
     }
   };
 
@@ -99,6 +86,8 @@ const CancelTicket = () => {
                 required
               />
             </div>
+            {/* Error message */}
+            {errorMessage && <p className="error-message">{errorMessage}</p>}
 
             <button type="submit" className="submit-btn" disabled={loading}>
               {loading ? "Processing..." : "Cancel Ticket"}

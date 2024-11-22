@@ -2,7 +2,6 @@
 // NOTE for other Dev: This page got noting to do with backend, unless
 // we want to store the team members data in the backend and fetch it here
 
-
 import React from 'react';
 import Footer from '../../components/Footer/Footer';
 import { FaLinkedin, FaGithub } from 'react-icons/fa';

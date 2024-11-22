@@ -27,12 +27,20 @@ export const useApi = (endpoint, method = "GET", options = {}) => {
 
       setResponseStatus(response.status);
 
-      const result = response.ok ? await response.json() : null;
+      const contentType = response.headers.get("Content-Type");
+      let result = null;
+
+      // Parse response based on content type
+      if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
+      } else {
+        result = await response.text();
+      }
 
       if (!response.ok) {
-        throw new Error(
-          result?.message || response.statusText || "Request failed"
-        );
+        const errorMessage =
+          result?.message || result || response.statusText || "Request failed";
+        throw new Error(errorMessage);
       }
 
       setData(result);

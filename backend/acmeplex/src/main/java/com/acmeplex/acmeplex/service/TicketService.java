@@ -39,28 +39,40 @@ public class TicketService {
     @Autowired
     private RegisteredUserService registeredUserService;
 
-
     // Save a ticket
-    public Ticket saveTicket(int movieId, int seatId, int showtimeId) {
-        // Retrieve the existing Movie, Seat, and Showtime from the database
+    public Ticket saveTicket(int movieId, List<Seat> seats, int showtimeId, double price) {
+        // Retrieve the existing Movie and Showtime from the database
         Movie movie = movieRepository.findById(movieId)
             .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
-    
-        Seat seat = seatRepository.findById(seatId)
-            .orElseThrow(() -> new IllegalArgumentException("Seat not found"));
-    
+
         Showtime showtime = showtimeRepository.findById(showtimeId)
             .orElseThrow(() -> new IllegalArgumentException("Showtime not found"));
-    
-        // Create a new Ticket and set its associations
+
+        // Validate and associate each seat with the correct showtime
+        for (Seat seat : seats) {
+            if (seat.getShowtime().getShowtimeId() != showtimeId) {
+                throw new IllegalArgumentException("Seat " + seat.getSeatRow() + "-" + seat.getSeatNumber() 
+                    + " does not belong to showtime " + showtimeId);
+            }
+        }
+
+        // Create and populate the Ticket entity
         Ticket ticket = new Ticket();
-        ticket.setMovie(movie); 
-        ticket.setSeat(seat);   
+        ticket.setMovie(movie);
         ticket.setShowtime(showtime);
-    
-        // Save the Ticket to the repository
-        return ticketRepository.save(ticket); 
+        ticket.setPrice(price);
+
+        // Set the bidirectional relationship
+        for (Seat seat : seats) {
+            seat.setTicket(ticket); 
+        }
+        ticket.setSeats(seats); 
+
+
+        // Save the ticket to the database
+        return ticketRepository.save(ticket);
     }
+
 
     // Find ticket by ID
     public Ticket getTicketById(int ticketId) {

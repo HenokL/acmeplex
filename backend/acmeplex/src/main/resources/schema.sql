@@ -6,10 +6,10 @@ USE acmeplex;
 
 -- Drop tables if they exist to ensure a fresh start
 DROP TABLE IF EXISTS Receipt;
+DROP TABLE IF EXISTS Seat;
 DROP TABLE IF EXISTS Ticket;
 DROP TABLE IF EXISTS Payment;
 DROP TABLE IF EXISTS Credit;
-DROP TABLE IF EXISTS Seat;
 DROP TABLE IF EXISTS Showtime;
 DROP TABLE IF EXISTS Movie;
 DROP TABLE IF EXISTS RegisteredUser;
@@ -31,15 +31,6 @@ CREATE TABLE IF NOT EXISTS Showtime (
     endTime VARCHAR(255) NOT NULL, 
     showtimeDate Date NOT NULL, 
     FOREIGN KEY (movieId) REFERENCES Movie(movieId)
-);
-
--- Creates the Seat table if it doesn't already exist
-CREATE TABLE IF NOT EXISTS Seat (
-    seatId INT AUTO_INCREMENT PRIMARY KEY,
-    seatNumber INT NOT NULL,
-    seatRow INT NOT NULL,
-    showtimeId INT NOT NULL,
-    FOREIGN KEY (showtimeId) REFERENCES Showtime(showtimeId)
 );
 
 -- Creates the RegisteredUser table if it doesn't already exist
@@ -68,12 +59,22 @@ CREATE TABLE IF NOT EXISTS Ticket (
     status VARCHAR(50),
     purchaseDate DATE,
     movieId INT,
-    seatId INT,
     showtimeId INT,
     FOREIGN KEY (movieId) REFERENCES Movie(movieId),
-    FOREIGN KEY (seatId) REFERENCES Seat(seatId),
     FOREIGN KEY (showtimeId) REFERENCES Showtime(showtimeId)
 );
+
+-- Creates the Seat table if it doesn't already exist
+CREATE TABLE IF NOT EXISTS Seat (
+    seatId INT AUTO_INCREMENT PRIMARY KEY,
+    seatNumber INT NOT NULL,
+    seatRow INT NOT NULL,
+    showtimeId INT NOT NULL,
+    ticketId INT NOT NULL,
+    FOREIGN KEY (showtimeId) REFERENCES Showtime(showtimeId),
+    FOREIGN KEY (ticketId) REFERENCES Ticket(ticketId)
+);
+
  
 -- Creates the Receipt table if it doesn't already exist
 CREATE TABLE IF NOT EXISTS Receipt (
@@ -84,6 +85,8 @@ CREATE TABLE IF NOT EXISTS Receipt (
     FOREIGN KEY (paymentId) REFERENCES Payment(paymentId),
     FOREIGN KEY (ticketId) REFERENCES Ticket(ticketId)
 );
+
+
 
 -- Creates the credit table if it doesn't already exist
 CREATE TABLE IF NOT EXISTS Credit (
@@ -96,8 +99,6 @@ CREATE TABLE IF NOT EXISTS Credit (
 
 -- Insertion
 -- Script to insert into the Database tables
-
--- Inserting into the Movie Table
 INSERT INTO Movie (title, duration, genre) VALUES
 ('Inception', 2.5, 'Sci-Fi'),
 ('The Dark Knight', 2.75, 'Action'),
@@ -120,6 +121,17 @@ INSERT INTO Movie (title, duration, genre) VALUES
 ('Gladiator', 2.5, 'Action'),
 ('Braveheart', 2.8, 'History');
 
+-- Insert data into the Showtime table
+INSERT INTO Showtime (movieId, startTime, endTime, showtimeDate) VALUES
+(1, '14:00:00', '16:30:00', '2024-11-20'),
+(5, '17:00:00', '19:45:00', '2024-11-21'),
+(10, '20:00:00', '22:30:00', '2024-11-22'),
+(12, '09:00:00', '11:30:00', '2024-11-23'),
+(15, '12:00:00', '14:30:00', '2024-11-24'),
+(8, '16:00:00', '18:00:00', '2024-11-25'),
+(14, '19:00:00', '21:30:00', '2024-11-26'),
+(18, '21:00:00', '23:30:00', '2024-11-27');
+
 -- Insert data into the RegisteredUser table
 INSERT INTO RegisteredUser (name, email, password) VALUES
 ('John Doe', 'john.doe@example.com', 'password123'),
@@ -132,51 +144,6 @@ INSERT INTO RegisteredUser (name, email, password) VALUES
 ('James Taylor', 'james.taylor@example.com', '123abc456'),
 ('Sophia Lee', 'sophia.lee@example.com', 'securepassword789'),
 ('Lucas Harris', 'lucas.harris@example.com', 'qwertyuiop');
-
--- Insert data into the Showtime table
-INSERT INTO Showtime (movieId, startTime, endTime, showtimeDate) VALUES
-(1, '14:00:00', '16:30:00', '2024-11-20'),
-(5, '17:00:00', '19:45:00', '2024-11-21'),
-(10, '20:00:00', '22:30:00', '2024-11-22'),
-(12, '09:00:00', '11:30:00', '2024-11-23'),
-(15, '12:00:00', '14:30:00', '2024-11-24'),
-(8, '16:00:00', '18:00:00', '2024-11-25'),
-(14, '19:00:00', '21:30:00', '2024-11-26'),
-(18, '21:00:00', '23:30:00', '2024-11-27');
-
--- Insert data into the Seat table
-INSERT INTO Seat (seatNumber, seatRow, showtimeId) VALUES
-(1, 1, 1),
-(2, 1, 1),
-(3, 2, 1),
-(4, 2, 1),
-(5, 3, 1),
-(6, 3, 1),
-(7, 4, 1),
-(8, 4, 1),
-(9, 5, 1),
-(10, 5, 1),
-(11, 1, 2),
-(12, 1, 2),
-(13, 2, 2),
-(14, 2, 2),
-(15, 3, 2),
-(16, 3, 2),
-(17, 4, 2),
-(18, 4, 2);
-
--- Insert data into the Ticket table
-INSERT INTO Ticket (email, price, status, purchaseDate, movieId, seatId, showtimeId) VALUES
-('john.doe@example.com', 15.50, 'Booked', '2024-11-16', 1, 5, 3),
-('alice.jones@example.com', 18.00, 'Booked', '2024-11-16', 2, 8, 3),
-('bob.smith@example.com', 20.00, 'Cancelled', '2024-11-17', 1, 2, 4),
-('charlie.brown@example.com', 12.00, 'Booked', '2024-11-17', 3, 1, 5),
-('david.white@example.com', 16.50, 'Booked', '2024-11-18', 2, 6, 4),
-('eva.green@example.com', 14.00, 'Refunded', '2024-11-18', 3, 4, 5),
-('frank.harris@example.com', 17.00, 'Booked', '2024-11-19', 1, 7, 6),
-('grace.miller@example.com', 19.00, 'Booked', '2024-11-19', 2, 9, 6),
-('lucas.harris@example.com', 22.00, 'Booked', '2024-11-20', 3, 10, 7),
-('emily.johnson@example.com', 20.00, 'Booked', '2024-11-21', 4, 12, 7);
 
 -- Insert data into the Payment table
 INSERT INTO Payment (amount, creditCardNumber, creditCardName, creditCardCV, paymentDate) VALUES
@@ -203,3 +170,36 @@ INSERT INTO Credit (email, creditAmount, issuedDate) VALUES
 ('james.taylor@example.com', 180.00, '2024-11-08'),
 ('sophia.lee@example.com', 220.00, '2024-11-09'),
 ('lucas.harris@example.com', 130.00, '2024-11-10');
+
+-- Insert data into the Ticket table (including seatId)
+INSERT INTO Ticket (email, price, status, purchaseDate, movieId, showtimeId) VALUES
+('john.doe@example.com', 15.50, 'Booked', '2024-11-16', 1, 3),
+('alice.jones@example.com', 18.00, 'Booked', '2024-11-16', 2, 3),
+('bob.smith@example.com', 20.00, 'Cancelled', '2024-11-17', 1, 4),
+('charlie.brown@example.com', 12.00, 'Booked', '2024-11-17', 3, 5),
+('david.white@example.com', 16.50, 'Booked', '2024-11-18', 2, 4),
+('eva.green@example.com', 14.00, 'Booked', '2024-11-18', 3, 5),
+('frank.harris@example.com', 17.00, 'Booked', '2024-11-19', 1, 6),
+('grace.miller@example.com', 19.00, 'Booked', '2024-11-19', 2, 6),
+('lucas.harris@example.com', 22.00, 'Booked', '2024-11-20', 3, 7),
+('emily.johnson@example.com', 20.00, 'Booked', '2024-11-21', 4, 7);
+
+-- Insert data into the Seat table
+INSERT INTO Seat (seatNumber, seatRow, showtimeId, ticketId) VALUES
+(1, 1, 3, 1),  
+(2, 1, 3, 2),
+(3, 2, 3, 2), 
+(4, 2, 3, 2),
+(5, 3, 3, 1), 
+(6, 3, 3, 3), 
+(7, 4, 3, 1), 
+(8, 4, 3, 2), 
+(9, 5, 3, 2),  
+(10, 5, 3, 1), 
+(11, 1, 4, 3), 
+(12, 1, 4, 4), 
+(13, 2, 4, 4), 
+(14, 2, 4, 4),  
+(15, 3, 4, 5),  
+(16, 3, 4, 5),  
+(17, 4, 4, 5);

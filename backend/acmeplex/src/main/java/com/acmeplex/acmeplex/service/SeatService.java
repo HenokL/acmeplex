@@ -32,8 +32,13 @@ public class SeatService {
         return seatRepository.findBySeatNumberAndShowtime(seatNumber, showtime);
     }
 
-    // Book a seat (Save into the database)
-    public Seat saveSeat(Seat seat) {
-        return seatRepository.save(seat);
+    // Check if a seat is booked based on seatNumber, seatRow, and showtimeId
+    public boolean isSeatBooked(int showtimeId, int seatNumber, int seatRow) {
+        return seatRepository.existsBySeatNumberAndSeatRowAndShowtime_ShowtimeId(seatNumber, seatRow, showtimeId);
+    }
+
+    // Book multiple seats (Save into the database)
+    public List<Seat> saveAllSeats(List<Seat> seats) {
+        return seatRepository.saveAll(seats);
     }
 }

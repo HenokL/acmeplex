@@ -74,8 +74,6 @@ public class Receipt {
         return ticket;
     }
 
-    
-
     public void setTicket(Ticket ticket) {
         this.ticket = ticket;
     }

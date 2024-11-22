@@ -40,17 +40,17 @@ public class SeatController {
             // Showtime exists - get the booked seats
             List<Seat> seats = seatService.getSeatsByShowtime(optionalShowtime.get());
 
-              // Convert Seat entities to SeatResponseDTO
-              List<SeatResponseDTO> seatResponseList = seats.stream()
-              .map(seat -> new SeatResponseDTO(seat.getSeatNumber(), seat.getSeatRow()))
-                      .collect(Collectors.toList());
-              
+            // Convert Seat entities to SeatResponseDTO
+            List<SeatResponseDTO> seatResponseList = seats.stream()
+                    .map(seat -> new SeatResponseDTO(seat.getSeatNumber(), seat.getSeatRow()))
+                    .collect(Collectors.toList());
 
             return new ResponseEntity<>(seatResponseList, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+    /*
     
     // Book a seat for a showtime@PostMapping("/book")
     @PostMapping("/book")
@@ -97,4 +97,6 @@ public class SeatController {
         // Return success message with status CREATED
         return new ResponseEntity<>("Seats booked successfully", HttpStatus.CREATED);
     }
+
+    */
 }

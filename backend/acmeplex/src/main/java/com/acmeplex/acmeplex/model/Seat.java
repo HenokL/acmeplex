@@ -33,15 +33,22 @@ public class Seat {
     @JoinColumn(name = "showtimeId", nullable = false) 
     private Showtime showtime;
 
+    // Mapping foreign key for Tickets
+    @ManyToOne
+    @JoinColumn(name = "ticketId", nullable = false)  
+    private Ticket ticket; 
+
+
     // Default Constructor
     public Seat() {
     }
 
     // Parameterized Constructor
-    public Seat(int seatNumber, int seatRow, Showtime showtime) {
+    public Seat(int seatNumber, int seatRow, Showtime showtime, Ticket ticket) {
         this.seatNumber = seatNumber;
         this.seatRow = seatRow;
         this.showtime = showtime;
+        this.ticket = ticket;
     }
 
     // Getters and Setters
@@ -75,6 +82,16 @@ public class Seat {
 
     public void setShowtime(Showtime showtime) {
         this.showtime = showtime;
+    }
+
+    // Setting the ticket
+    public void setTicket(Ticket ticket) {
+        this.ticket = ticket;
+    }
+
+    // Getting the ticket
+    public Ticket getTicket() {
+        return this.ticket;
     }
     
 }

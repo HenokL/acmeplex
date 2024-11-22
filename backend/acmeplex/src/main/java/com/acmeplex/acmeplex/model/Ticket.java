@@ -1,4 +1,5 @@
 package com.acmeplex.model;
+import com.acmeplex.model.Seat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
@@ -6,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -45,9 +48,8 @@ public class Ticket {
     private Movie movie;
 
     // Foreign key seatId
-    @ManyToOne
-    @JoinColumn(name = "seatId", referencedColumnName = "seatId", nullable = false)
-    private Seat seat;
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
+    private List<Seat> seats;
 
     // Foreign key showtimeId
     @ManyToOne
@@ -59,13 +61,12 @@ public class Ticket {
     }
 
      // Parameterized Constructor
-     public Ticket(String email, double price, String status, Date purchaseDate, Movie movie, Seat seat, Showtime showtime) {
+     public Ticket(String email, double price, String status, Date purchaseDate, Movie movie, Showtime showtime) {
         this.email = email;
         this.price = price;
         this.status = status;
         this.purchaseDate = purchaseDate;
         this.movie = movie;
-        this.seat = seat;
         this.showtime = showtime;
     }
 
@@ -118,12 +119,13 @@ public class Ticket {
         this.movie = movie;
     }
 
-    public Seat getSeat() {
-        return seat;
+    // Returns all the corresponding seats for the ticket
+    public List<Seat> getSeats() {
+        return this.seats;
     }
 
-    public void setSeat(Seat seat) {
-        this.seat = seat;
+    public void setSeats(List<Seat> seats) {
+        this.seats = seats;
     }
 
     public Showtime getShowtime() {

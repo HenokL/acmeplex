@@ -18,6 +18,13 @@ public interface SeatRepository extends JpaRepository<Seat, Integer> {
     // Find all showtimes for a specific movie
     List<Seat> findByShowtime(Showtime showtime);
 
-     // Find a specific seat by seatNumber and showtime
-     Optional<Seat> findBySeatNumberAndShowtime(int seatNumber, Showtime showtime);
+    // Find a specific seat by seatNumber and showtime
+    Optional<Seat> findBySeatNumberAndShowtime(int seatNumber, Showtime showtime);
+
+    // Check if a seat exists by its seatId
+    public boolean existsBySeatId(int seatId);
+
+    // Check if a seat exists for a showtime already
+    boolean existsBySeatNumberAndSeatRowAndShowtime_ShowtimeId(int seatNumber, int seatRow, int showtimeId);
+
 }

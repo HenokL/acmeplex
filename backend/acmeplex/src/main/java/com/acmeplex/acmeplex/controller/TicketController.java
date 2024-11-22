@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.time.LocalTime;
 import java.time.Duration;
 import java.util.HashMap;
@@ -123,40 +124,63 @@ public class TicketController {
     @PostMapping("/book")
     public ResponseEntity<?> bookTicket(@RequestBody Map<String, Object> request) {
         try {
-            // Extract showtimeId, seat info, and payment details from the request
             int showtimeId = (int) request.get("showtimeId");
-            int seatNumber = (int) request.get("seatNumber");
-            int seatRow = (int) request.get("seatRow");
-            int seatId = (int) request.get("seatId");
             double price = (double) request.get("price");
             long creditCardNumber = (long) request.get("creditCardNumber");
             String creditCardName = (String) request.get("creditCardName");
             int creditCardCV = (int) request.get("creditCardCV");
             String email = (String) request.get("email");
+            List<Map<String, Object>> seats = (List<Map<String, Object>>) request.get("seats");
 
-            // Retreive showtime and movieID
             Showtime showtime = showtimeService.getShowtimeById(showtimeId)
                     .orElseThrow(() -> new RuntimeException("Showtime not found for ID " + showtimeId));
-            int movieId = showtime.getMovie().getMovieId();  // Get movieId from Showtime
-            
+            int movieId = showtime.getMovie().getMovieId();
 
-        
+            // List to hold seat objects
+            List<Seat> seatList = new ArrayList<>();
+
+            for (Map<String, Object> seatInfo : seats) {
+                int seatNumber = (int) seatInfo.get("seatNumber");
+                int seatRow = (int) seatInfo.get("seatRow");
+
+                // Check if the seat is already booked
+                if (seatService.isSeatBooked(showtimeId, seatNumber, seatRow)) {
+                    throw new RuntimeException("Seat " + seatRow + "-" + seatNumber + " is already booked for showtime " + showtimeId);
+                }
+
+                // Create and associate the seat
+                Seat seat = new Seat();
+                seat.setSeatNumber(seatNumber);
+                seat.setSeatRow(seatRow);
+                seat.setShowtime(showtime); 
+                seatList.add(seat); // Add to the list of seats
+            }
+
             // Create the payment
             Payment payment = paymentService.createPayment(price, creditCardNumber, creditCardName, creditCardCV);
 
-            // Book the ticket
-            Ticket bookedTicket = ticketService.saveTicket(movieId, seatId, showtimeId);
-                
-            // Save the receipt to the database
+            // Book the ticket with the saved seats
+            Ticket bookedTicket = ticketService.saveTicket(movieId, seatList, showtimeId, price);
+
+            // Associate the ticket with each set and then save the seats
+            // Associate the ticket with each seat and then save the seats
+            for (Seat seat : seatList) {
+                seat.setTicket(bookedTicket); 
+            }
+            seatService.saveAllSeats(seatList);
+
+
+            // Save the receipt
             Receipt receipt = receiptService.createReceipt(email, payment.getPaymentId(), bookedTicket.getTicketId());
 
-            // Return success message
+            // Return success with ticket ID
             return new ResponseEntity<>(bookedTicket.getTicketId(), HttpStatus.CREATED);
 
-
-            } catch (Exception e) {
-                // Handle errors (e.g., payment failure, booking failure)
-                return new ResponseEntity<>("Error processing the booking", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+        } catch (Exception e) {
+            // Handle any error
+            return new ResponseEntity<>("Error processing the booking: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
 }

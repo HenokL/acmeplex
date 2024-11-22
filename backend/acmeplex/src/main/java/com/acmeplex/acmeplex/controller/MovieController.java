@@ -42,14 +42,5 @@ public class MovieController {
             //  Return 404 not found if the movie does not exist
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);  
         }
-    }
-
-    
-
-
-
-
-
-
-    
+    }    
 }

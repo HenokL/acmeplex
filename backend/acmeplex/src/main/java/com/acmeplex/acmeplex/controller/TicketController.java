@@ -150,9 +150,6 @@ public class TicketController {
             // Save the receipt to the database
             Receipt receipt = receiptService.createReceipt(email, payment.getPaymentId(), bookedTicket.getTicketId());
 
-            // Step 4: Send receipt email (using receiptService)
-            receiptService.sendReceiptEmail(receipt);
-
             // Return success message
             return new ResponseEntity<>(bookedTicket.getTicketId(), HttpStatus.CREATED);
 

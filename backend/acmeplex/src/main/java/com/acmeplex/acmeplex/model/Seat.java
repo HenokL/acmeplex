@@ -9,6 +9,7 @@ import java.time.LocalTime;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
+import java.util.List;
 
 @Entity
 @Table(name = "Seat") // Use lowercase table name

@@ -18,10 +18,32 @@ public class MovieService {
 
     // Method to retrieve all movies
     public List<MovieDTO> getAllMovies() {
+
+        // Retrieving all the movies
         List<Movie> movies = movieRepository.findAll();
 
+        // Calculating the date six months from now
+        LocalDate sixMonthsFromNow = LocalDate.now().plusMonths(6);
+
+        /*
+         * CONDITIONAL
+         * Retrieve movies that have a showtime within 6 months
+         * OR
+         * Movies that have showtimes after 6 months with at least 4 seats filled
+         */
+        List<Movie> filteredMovies = movies.stream()
+            .filter(movie -> 
+                // Condition 1: Movie has a showtime within the next 6 months
+                movie.getShowtimes().stream()
+                    .anyMatch(showtime -> showtime.getShowtimeDate().toLocalDate().isBefore(sixMonthsFromNow) || 
+                                          // Condition 2: Movie has showtimes after 6 months with at least 4 seats filled
+                                          (showtime.getShowtimeDate().toLocalDate().isAfter(sixMonthsFromNow) && 
+                                           showtime.getBookedSeats() >= 4))
+            )
+            .collect(Collectors.toList());
+
         // Map movie entities to MovieDTOs
-        return movies.stream()
+        return filteredMovies.stream()
                 .map(movie -> new MovieDTO(
                         movie.getMovieId(),
                         movie.getTitle(),

@@ -176,7 +176,9 @@ INSERT INTO Ticket (email, price, status, purchaseDate, movieId, showtimeId) VAL
 ('jane.smith@example.com', 15.0, 'Booked', '2024-11-21', 5, 2),
 ('emily.johnson@example.com', 12.0, 'Booked', '2024-11-22', 10, 3),
 ('michael.brown@example.com', 18.0, 'Booked', '2024-11-23', 12, 4),
-('sarah.davis@example.com', 14.0, 'Booked', '2024-11-24', 15, 5);
+('sarah.davis@example.com', 14.0, 'Booked', '2024-11-24', 15, 5),
+('sarah.davis@example.com', 100.0, 'Booked', '2024-11-24', 30, 18);
+
 
 -- Insert data into the Seat table
 INSERT INTO Seat (seatNumber, seatRow, showtimeId, ticketId) VALUES
@@ -184,7 +186,12 @@ INSERT INTO Seat (seatNumber, seatRow, showtimeId, ticketId) VALUES
 (2, 1, 2, 2),
 (3, 1, 3, 3),
 (4, 1, 4, 4),
-(5, 1, 5, 5);
+(5, 1, 5, 5),
+(1, 1, 18, 6),
+(1, 2, 18, 6),
+(1, 3, 18, 6),
+(1, 4, 18, 6),
+(1, 5, 18, 6);
 
 -- Insert data into the Receipt table
 INSERT INTO Receipt (email, paymentId, ticketId) VALUES

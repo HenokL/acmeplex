@@ -9,7 +9,10 @@ import java.time.LocalTime;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 import java.util.Date;
+import java.util.List;
 
 
 
@@ -35,6 +38,10 @@ public class Showtime {
 
     @Column(name = "endTime", nullable = false)
     private String endTime;
+
+    // Maps the seats to the showtime
+    @OneToMany(mappedBy = "showtime", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Seat> seats;
 
     // Default Constructor
     public Showtime() {
@@ -87,5 +94,15 @@ public class Showtime {
 
     public java.sql.Date getShowtimeDate() {
         return this.showtimeDate;
+    }
+    
+    // Sets the seats for a showtime
+    public void setSeats(List<Seat> seats) {
+        this.seats = seats;
+    }
+
+    // Returns the amount of booked seats for the showtime
+    public int getBookedSeats() {
+        return seats.size();
     }
 }

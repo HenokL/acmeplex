@@ -1,5 +1,6 @@
--- Creates the database tables
+-- Drop the tables in reverse order of dependencies
 
+-- Creates the database tables
 CREATE DATABASE IF NOT EXISTS acmeplex;
 USE acmeplex;
 
@@ -75,7 +76,7 @@ CREATE TABLE IF NOT EXISTS Receipt (
 );
 
 -- Creates the credit table if it doesn't already exist
-CREATE TABLE IF NOT EXISTS CREDIT (
+CREATE TABLE IF NOT EXISTS Credit (
     creditID INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     creditAmount DOUBLE DEFAULT 0

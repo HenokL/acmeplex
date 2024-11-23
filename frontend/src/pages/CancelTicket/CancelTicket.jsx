@@ -2,7 +2,7 @@
  * CancelTicket page which Handles ticket cancellation process with confirmation
  * Written by: Henok Lamiso and Yousef Fatouraee
  */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTicketAlt, FaCheckCircle } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
@@ -14,6 +14,7 @@ const CancelTicket = () => {
   const [ticketNumber, setTicketNumber] = useState("");
   const [email, setEmail] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showEmail, setShowEmail] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -52,7 +53,13 @@ const CancelTicket = () => {
       setIsSuccess(false);
     }
   };
-
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    if (storedEmail) {
+      setShowEmail(false);
+      setEmail(storedEmail); // Set email from localStorage if available
+    }
+  }, []);
   // Renders the cancel ticket form
   return (
     <>
@@ -75,17 +82,18 @@ const CancelTicket = () => {
                 required
               />
             </div>
-
-            <div className="form-group">
-              <MdEmail className="input-icon" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter Email Address"
-                required
-              />
-            </div>
+            {showEmail && (
+              <div className="form-group">
+                <MdEmail className="input-icon" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter Email Address"
+                  required
+                />
+              </div>
+            )}
             {/* Error message */}
             {errorMessage && <p className="error-message">{errorMessage}</p>}
 

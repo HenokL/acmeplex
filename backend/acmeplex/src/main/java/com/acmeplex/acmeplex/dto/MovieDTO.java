@@ -5,12 +5,14 @@ public class MovieDTO {
     private String title;
     private Double duration;
     private String genre;
+    private int id;
 
-    public MovieDTO(int movieId, String title, Double duration, String genre) {
+    public MovieDTO(int movieId, String title, Double duration, String genre, int id) {
         this.movieId = movieId;
         this.title = title;
         this.duration = duration;
         this.genre = genre;
+        this.id = id;
     }
 
     // Getters and setters
@@ -44,5 +46,9 @@ public class MovieDTO {
 
     public void setGenre(String genre) {
         this.genre = genre;
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

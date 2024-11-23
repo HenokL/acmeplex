@@ -48,7 +48,8 @@ public class MovieService {
                         movie.getMovieId(),
                         movie.getTitle(),
                         movie.getDuration(),
-                        movie.getGenre()))
+                        movie.getGenre(),
+                        movie.getId()))
                 .collect(Collectors.toList());
     }
     
@@ -80,7 +81,8 @@ public class MovieService {
                         movie.getMovieId(),
                         movie.getTitle(),
                         movie.getDuration(),
-                        movie.getGenre())) 
+                        movie.getGenre(),
+                        movie.getId())) 
                 .collect(Collectors.toList());
     }
 }

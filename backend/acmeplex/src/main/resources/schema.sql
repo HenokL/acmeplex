@@ -4,6 +4,8 @@
 CREATE DATABASE IF NOT EXISTS acmeplex;
 USE acmeplex;
 
+set FOREIGN_KEY_CHECKS = 1;
+
 -- Drop tables if they exist to ensure a fresh start
 DROP TABLE IF EXISTS Receipt;
 DROP TABLE IF EXISTS Seat;
@@ -23,7 +25,7 @@ CREATE TABLE IF NOT EXISTS Movie (
 );
 
 -- Creates the Showtime table if it doesn't already exist
-  
+
 CREATE TABLE IF NOT EXISTS Showtime (
     showtimeId INT AUTO_INCREMENT PRIMARY KEY,
     movieId INT NOT NULL, 
@@ -31,7 +33,7 @@ CREATE TABLE IF NOT EXISTS Showtime (
     endTime VARCHAR(255) NOT NULL, 
     showtimeDate Date NOT NULL, 
     FOREIGN KEY (movieId) REFERENCES Movie(movieId)
-);
+); 
 
 -- Creates the RegisteredUser table if it doesn't already exist
 CREATE TABLE IF NOT EXISTS RegisteredUser (
@@ -131,6 +133,7 @@ INSERT INTO Movie (title, duration, genre) VALUES
 -- Insert data into the Showtime table
 INSERT INTO Showtime (movieId, startTime, endTime, showtimeDate) VALUES
 (1, '14:00:00', '16:30:00', '2024-11-20'),
+(1, '16:00:00', '16:30:00', '2024-11-20'),
 (5, '17:00:00', '19:45:00', '2024-11-21'),
 (10, '20:00:00', '22:30:00', '2024-11-22'),
 (12, '09:00:00', '11:30:00', '2024-11-23'),

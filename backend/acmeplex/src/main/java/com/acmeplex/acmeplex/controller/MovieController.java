@@ -14,7 +14,6 @@ import java.util.Map;
 @RequestMapping("/api")
 public class MovieController {
 
-    
     private final MovieService movieService;
 
     public MovieController(MovieService movieService) {
@@ -46,7 +45,6 @@ public class MovieController {
     }
     
     // Retrieves a list of upcoming movies
-    // Retrieves a list of all movies
     @GetMapping("/upcoming/movies")
     public ResponseEntity<List<MovieDTO>> getUpcomingMovies() {
 

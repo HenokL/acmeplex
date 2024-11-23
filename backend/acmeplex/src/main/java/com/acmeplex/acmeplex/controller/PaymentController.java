@@ -45,28 +45,4 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
-    // Process a new payment
-    @PostMapping("/process")
-    public ResponseEntity<String> processPayment(@RequestBody Payment paymentRequest) {
-
-        // Create a new payment and save it
-        Payment payment = paymentService.createPayment(
-                paymentRequest.getAmount(),
-                paymentRequest.getCreditCardNumber(),
-                paymentRequest.getCreditCardName(),
-                paymentRequest.getCreditCardCV()
-        );
-        // Send sucessful message back
-        return ResponseEntity.ok("Payment processed successfully. Payment ID: " + payment.getPaymentId());
-    }
-
-    
-
-
-
-
-
-
-    
 }

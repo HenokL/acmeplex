@@ -9,6 +9,9 @@ import java.util.Optional;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Date;
+import java.time.LocalDate;
+;
+
 
 
 @RestController
@@ -36,4 +39,35 @@ public class CreditController {
             return ResponseEntity.status(500).body(null);
         }
     }
+
+
+    // Deducts credits from a specified email
+    @PostMapping("/deductCredits")
+    public ResponseEntity<?> deductCredits(@RequestBody Map<String, Object> request) {
+        try {
+            // Extract email and creditsUsed from the request body
+            String email = (String) request.get("email");
+            double creditsUsed = (double) request.get("creditsUsed");
+
+              // Get the total available credit for the user
+            double totalCredit = creditService.getTotalCreditByEmail(email);
+
+            // Check if there are enough credits to deduct
+            if (creditsUsed > totalCredit) {
+                return new ResponseEntity<>("Insufficient credits. Current balance: " + totalCredit, HttpStatus.BAD_REQUEST);
+            }
+
+            // Deduct the credits using the CreditService
+            creditService.issueCredits(email, -creditsUsed);
+
+            // Return success response with the remaining balance after deduction
+            double newTotalCredit = creditService.getTotalCreditByEmail(email);
+            return new ResponseEntity<>("Credits deducted successfully. New balance: " + newTotalCredit, HttpStatus.OK);
+
+        } catch (Exception e) {
+            // Handle any error
+            return new ResponseEntity<>("Error processing the credit deduction: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

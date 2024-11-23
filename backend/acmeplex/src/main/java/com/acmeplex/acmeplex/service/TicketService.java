@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.util.Date;
 import java.time.LocalTime;          
 import javax.persistence.OneToMany;  
 import javax.persistence.ManyToOne; 
@@ -40,7 +41,7 @@ public class TicketService {
     private RegisteredUserService registeredUserService;
 
     // Save a ticket
-    public Ticket saveTicket(int movieId, List<Seat> seats, int showtimeId, double price) {
+    public Ticket saveTicket(int movieId, List<Seat> seats, int showtimeId, String email, double price) {
         // Retrieve the existing Movie and Showtime from the database
         Movie movie = movieRepository.findById(movieId)
             .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
@@ -61,6 +62,9 @@ public class TicketService {
         ticket.setMovie(movie);
         ticket.setShowtime(showtime);
         ticket.setPrice(price);
+        ticket.setEmail(email);
+        ticket.setStatus("Booked");
+        ticket.setPurchaseDate(new Date());
 
         // Set the bidirectional relationship
         for (Seat seat : seats) {
@@ -99,6 +103,12 @@ public class TicketService {
         // Attempt to retrieve the ticket
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
+        
+         // Retrieve the seats associated with this ticket
+        List<Seat> seatsToDelete = ticket.getSeats();
+
+        // Delete the seats from the database
+        seatRepository.deleteAll(seatsToDelete);
 
         // Update its status to "Cancelled"
         ticket.setStatus("Cancelled");

@@ -64,7 +64,7 @@ public class TicketController {
         return new ResponseEntity<>(tickets, HttpStatus.OK);
     }
 
-    // Cancelling a ticket for an ordinary user
+    // Cancelling a ticket
     @PutMapping("/cancel/{ticketId}")
     public ResponseEntity<String> cancelTicket(@PathVariable int ticketId, @RequestBody Map<String, String> request) {
 
@@ -160,7 +160,7 @@ public class TicketController {
             Payment payment = paymentService.createPayment(price, creditCardNumber, creditCardName, creditCardCV);
 
             // Book the ticket with the saved seats
-            Ticket bookedTicket = ticketService.saveTicket(movieId, seatList, showtimeId, price);
+            Ticket bookedTicket = ticketService.saveTicket(movieId, seatList, showtimeId, email, price);
 
             // Associate the ticket with each set and then save the seats
             // Associate the ticket with each seat and then save the seats

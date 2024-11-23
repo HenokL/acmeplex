@@ -7,7 +7,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useApi } from "../../hooks/useApi";
 import {
   Container,
@@ -30,6 +30,9 @@ import Footer from "../../components/Footer/Footer";
 import "./Tickets.css";
 
 const Tickets = () => {
+  const location = useLocation();
+  const isUpcoming = location?.state?.upcoming || false;
+
   const navigate = useNavigate();
   const [selectedMovie, setSelectedMovie] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
@@ -40,7 +43,11 @@ const Tickets = () => {
   const [times, setTimes] = useState([]);
   const [theaters, setTheatre] = useState(["Theater 1"]);
 
-  const { data: movies, loading, error } = useApi("api/movies", "GET");
+  const {
+    data: movies,
+    loading,
+    error,
+  } = useApi(isUpcoming ? "api/upcoming/movies" : "api/movies", "GET");
   const {
     data: showtimes,
     loading: showtimeLoading,

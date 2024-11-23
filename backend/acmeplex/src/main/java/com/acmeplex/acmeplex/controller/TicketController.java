@@ -125,7 +125,7 @@ public class TicketController {
     public ResponseEntity<?> bookTicket(@RequestBody Map<String, Object> request) {
         try {
             int showtimeId = (int) request.get("showtimeId");
-            double price = (double) request.get("price");
+            Object priceObject = request.get("price");
             long creditCardNumber = (long) request.get("creditCardNumber");
             String creditCardName = (String) request.get("creditCardName");
             int creditCardCV = (int) request.get("creditCardCV");
@@ -135,6 +135,20 @@ public class TicketController {
             Showtime showtime = showtimeService.getShowtimeById(showtimeId)
                     .orElseThrow(() -> new RuntimeException("Showtime not found for ID " + showtimeId));
             int movieId = showtime.getMovie().getMovieId();
+
+
+            // Ensuring price is a double
+            double price = 0.0;
+            if (priceObject instanceof Integer) {
+                price = ((Integer) priceObject).doubleValue();  // Cast to double if it's an Integer
+            } else if (priceObject instanceof Float) {
+                price = ((Float) priceObject).doubleValue();  // Cast to double if it's a Float
+            } else if (priceObject instanceof Double) {
+                price = (Double) priceObject;  // Directly assign if it's already a Double
+            } else {
+                throw new IllegalArgumentException("Invalid type for price");
+            }
+
 
             // List to hold seat objects
             List<Seat> seatList = new ArrayList<>();

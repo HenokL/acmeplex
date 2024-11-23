@@ -100,16 +100,44 @@ const Tickets = () => {
 
   // Handles purchase action and navigation to payment
   const handlePurchase = () => {
+    // Extract the correct showtime ID based on the selected date and time
+    const showtimeID = showtimes.find(
+      (showtime) =>
+        showtime.showtimeDate === selectedDate &&
+        showtime.startTime === selectedTime
+    )?.showtimeId;
+
+    if (!showtimeID) {
+      console.error(
+        "No matching showtime found for the selected date and time."
+      );
+      return;
+    }
+
+    // Map selected seats to the desired format
+    const formattedSeats = selectedSeats.map((seatId) => {
+      const rowLetter = seatId.charAt(0); // First character is the row
+      const seatNumber = parseInt(seatId.slice(1), 10); // Remaining characters are the seat number
+      const seatRow = rows.indexOf(rowLetter) + 1; // Convert row letter to row number
+      return {
+        seatNumber: seatNumber,
+        seatRow: seatRow,
+      };
+    });
+
+    // Prepare ticket data
     const ticketData = {
       movie: selectedMovie,
       date: selectedDate,
       time: selectedTime,
+      showtimeId: showtimeID,
+      seats: formattedSeats,
+      seatsAlphabetic: selectedSeats,
       theater: selectedTheater,
-      seats: selectedSeats,
       total: selectedSeats.length * ticketPrice,
     };
-    console.log(ticketData);
 
+    // Navigate to the payment page with the ticket data
     navigate("/payment", { state: { ticketData } });
   };
   // Set available times and dates
@@ -146,8 +174,8 @@ const Tickets = () => {
                   Choose a movie
                 </MenuItem>
                 {movies &&
-                  movies.map((movie) => (
-                    <MenuItem key={movie.id} value={movie.title}>
+                  movies.map((movie, key) => (
+                    <MenuItem key={key} value={movie.title}>
                       {movie.title}
                     </MenuItem>
                   ))}
@@ -167,8 +195,8 @@ const Tickets = () => {
                 <MenuItem value="" disabled>
                   Choose a date
                 </MenuItem>
-                {dates.map((date) => (
-                  <MenuItem key={date} value={date}>
+                {dates.map((date, key) => (
+                  <MenuItem key={key} value={date}>
                     {date}
                   </MenuItem>
                 ))}
@@ -188,8 +216,8 @@ const Tickets = () => {
                 <MenuItem value="" disabled>
                   Choose a time
                 </MenuItem>
-                {times.map((time) => (
-                  <MenuItem key={time} value={time}>
+                {times.map((time, key) => (
+                  <MenuItem key={key} value={time}>
                     {time}
                   </MenuItem>
                 ))}
@@ -209,8 +237,8 @@ const Tickets = () => {
                 <MenuItem value="" disabled>
                   Choose a theater
                 </MenuItem>
-                {theaters.map((theater) => (
-                  <MenuItem key={theater} value={theater}>
+                {theaters.map((theater, key) => (
+                  <MenuItem key={key} value={theater}>
                     {theater}
                   </MenuItem>
                 ))}

@@ -1,22 +1,12 @@
 /**
  * Confirmation component - This Displays successful payment confirmation and ticket details
  */
-import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  Container,
-  Paper,
-  Typography,
-  Button,
-  Box,
-} from '@mui/material';
-import {
-  CheckCircleOutline,
-  Email,
-  Home
-} from '@mui/icons-material';
-import './Confirmation.css';
-import Footer from '../../components/Footer/Footer';
+import React, { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Container, Paper, Typography, Button, Box } from "@mui/material";
+import { CheckCircleOutline, Email, Home } from "@mui/icons-material";
+import "./Confirmation.css";
+import Footer from "../../components/Footer/Footer";
 
 const Confirmation = () => {
   // Get ticket data from navigation state
@@ -72,17 +62,26 @@ const Confirmation = () => {
               <Typography variant="body1">{ticketData?.theater}</Typography>
 
               <Typography variant="body2">Seats:</Typography>
-              <Typography variant="body1">{ticketData?.seats?.join(', ')}</Typography>
+              <Typography variant="body1">
+                {ticketData?.seatsAlphabetic?.join(", ")}
+              </Typography>
 
               <Typography variant="body2">Total Paid:</Typography>
               <Typography variant="body1">${ticketData?.total}</Typography>
+
+              <Typography variant="body2">
+                <strong>Ticket number/ID:</strong>
+              </Typography>
+              <Typography variant="body3">
+                <strong>{ticketData?.ticketId}</strong>
+              </Typography>
             </Box>
           </Paper>
 
           <Button
             variant="contained"
             startIcon={<Home />}
-            onClick={() => navigate('/')}
+            onClick={() => navigate("/")}
             className="home-button"
           >
             Back to Home
@@ -90,10 +89,8 @@ const Confirmation = () => {
         </Paper>
       </Container>
       <Footer />
-   
     </div>
   );
 };
 
 export default Confirmation;
-

@@ -42,6 +42,7 @@ const Payment = () => {
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [submittedOnce, setSubmittedOnce] = useState(false);
+  const [showEmail, setShowEmail] = useState(true);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -111,6 +112,19 @@ const Payment = () => {
       validateForm();
     }
   }, [formData]);
+
+  // Handle email box appearance
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("email");
+    if (storedEmail) {
+      setShowEmail(false);
+      // Set email from localStorage if available
+      setFormData((prev) => ({
+        ...prev,
+        email: storedEmail,
+      }));
+    }
+  }, []);
 
   // Handle data submission
   const handleSubmit = async (e) => {
@@ -254,21 +268,22 @@ const Payment = () => {
                     helperText={validationErrors.fullName}
                   />
                 </Box>
-
-                <Box className="form-field">
-                  <Email className="field-icon" />
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    error={!!validationErrors.email}
-                    helperText={validationErrors.email}
-                  />
-                </Box>
+                {showEmail && (
+                  <Box className="form-field">
+                    <Email className="field-icon" />
+                    <TextField
+                      fullWidth
+                      label="Email"
+                      name="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      error={!!validationErrors.email}
+                      helperText={validationErrors.email}
+                    />
+                  </Box>
+                )}
 
                 <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
                   Payment Details

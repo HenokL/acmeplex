@@ -47,7 +47,16 @@ public class CreditController {
         try {
             // Extract email and creditsUsed from the request body
             String email = (String) request.get("email");
-            double creditsUsed = (double) request.get("creditsUsed");
+            Object creditsUsedObj = request.get("creditsUsed");
+
+            // Convert creditsUsed to double
+            double creditsUsed = 0.0;
+            if (creditsUsedObj instanceof Number) {
+                creditsUsed = ((Number) creditsUsedObj).doubleValue();
+            } else {
+                // Handle the case where creditsUsed is not a number
+                return new ResponseEntity<>("Invalid creditsUsed value", HttpStatus.BAD_REQUEST);
+            }
 
               // Get the total available credit for the user
             double totalCredit = creditService.getTotalCreditByEmail(email);

@@ -42,7 +42,7 @@ const Payment = () => {
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [submittedOnce, setSubmittedOnce] = useState(false);
-  const [showEmail, setShowEmail] = useState(true);
+  const [isGuest, setIsGuest] = useState(true);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -58,6 +58,21 @@ const Payment = () => {
     responseStatus,
     fetchData: book,
   } = useApi("api/tickets/book", "POST");
+  const {
+    data: credit,
+    loading: creditLoading,
+    error: creditError,
+  } = useApi(
+    localStorage.getItem("email") ? `api/credits/${formData.email}` : "",
+    "GET"
+  );
+  const {
+    data: deductedCredit,
+    loading: deductCreditLoading,
+    error: deductCreditError,
+    responseStatus: deductCreditResponseStatus,
+    fetchData: deductCredit,
+  } = useApi("api/credits/deductCredits", "POST");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -117,7 +132,7 @@ const Payment = () => {
   useEffect(() => {
     const storedEmail = localStorage.getItem("email");
     if (storedEmail) {
-      setShowEmail(false);
+      setIsGuest(false);
       // Set email from localStorage if available
       setFormData((prev) => ({
         ...prev,
@@ -134,10 +149,51 @@ const Payment = () => {
       return;
     }
     const ticketData = location.state.ticketData;
+
+    // Submit credit deduction for registered users
+    if (!isGuest) {
+      try {
+        // Call the book API
+        const { result, status, error } = await deductCredit({
+          headers: { "Content-Type": "application/json" },
+          body: {
+            email: localStorage.getItem("email"),
+            creditsUsed: Math.min(ticketData.total * 1.05, credit),
+          },
+        });
+        // Handle response based on status
+        if (status === 200) {
+          if (result) {
+            // Redirect to the home page
+            console.log(result);
+            setError(result);
+          } else {
+            console.warn("No data returned by the API.");
+          }
+        } else if (status === 400) {
+          // this should be "Insufficient credits. Current balance: 0.0" error!
+          setError(error);
+        } else if (status === 404) {
+          setError(error);
+          return;
+        } else {
+          setError(error || "Please try again later!");
+          return;
+        }
+      } catch (err) {
+        console.error("Error during login:", err);
+        setError(
+          "An unexpected error occurred. Please check your network connection and try again."
+        );
+        return;
+      }
+    }
+
+    // Submit ticket creation
     try {
       const requestBody = {
         showtimeId: ticketData.showtimeId,
-        price: ticketData.total.toFixed(1) * 1.05, // Ensure price is a float
+        price: Math.max(ticketData?.total * 1.05 - credit, 0), // Ensure price is a float
         seats: ticketData.seats,
         creditCardNumber: parseInt(formData.cardNumber), // Ensure creditCardNumber is an int
         creditCardName: formData.fullName,
@@ -236,11 +292,29 @@ const Payment = () => {
                   </Typography>
                 </Box>
 
+                <Divider sx={{ my: 2 }} />
+
+                {/* Available Credit for registered users */}
+                {!isGuest && (
+                  <Box className="receipt-item">
+                    <Typography variant="body1">Available Credit:</Typography>
+                    {creditLoading ? (
+                      <Typography variant="body1">Loading...</Typography>
+                    ) : creditError ? (
+                      <Typography variant="body1" color="error">
+                        Error loading credit
+                      </Typography>
+                    ) : (
+                      <Typography variant="body1">${credit || 0}</Typography>
+                    )}
+                  </Box>
+                )}
+
                 {/* Updated Total with GST */}
                 <Box className="receipt-total">
                   <Typography variant="h6">Total:</Typography>
                   <Typography variant="h6">
-                    {ticketData?.total * 1.05}
+                    ${Math.max(ticketData?.total * 1.05 - credit, 0)}
                   </Typography>
                 </Box>
               </Box>
@@ -268,7 +342,7 @@ const Payment = () => {
                     helperText={validationErrors.fullName}
                   />
                 </Box>
-                {showEmail && (
+                {isGuest && (
                   <Box className="form-field">
                     <Email className="field-icon" />
                     <TextField

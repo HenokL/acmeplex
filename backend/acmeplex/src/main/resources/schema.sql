@@ -1,10 +1,13 @@
 -- Drop the tables in reverse order of dependencies
 
+set FOREIGN_KEY_CHECKS = 0;
+
+
 -- Creates the database tables
 CREATE DATABASE IF NOT EXISTS acmeplex;
 USE acmeplex;
 
-set FOREIGN_KEY_CHECKS = 1;
+-- set FOREIGN_KEY_CHECKS = 1;
 
 -- Drop tables if they exist to ensure a fresh start
 DROP TABLE IF EXISTS Receipt;

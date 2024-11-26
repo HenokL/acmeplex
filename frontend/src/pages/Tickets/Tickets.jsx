@@ -7,8 +7,8 @@
  */
 
 // src/pages/Tickets/Tickets.jsx
-import { useLoading } from '../../hooks/useLoading';
-import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import { useLoading } from "../../hooks/useLoading";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import { Autocomplete, TextField } from "@mui/material"; // We need to import Autocomplete and TextField from @mui/material
 
 import React, { useEffect, useState } from "react";
@@ -90,11 +90,28 @@ const Tickets = () => {
   const handleSeatSelect = (seatId) => {
     if (occupiedSeats?.includes(seatId)) return;
 
-    setSelectedSeats((prev) =>
-      prev.includes(seatId)
-        ? prev.filter((id) => id !== seatId)
-        : [...prev, seatId]
-    );
+    const totalSeats = rows.length * seatsPerRow; // Total available seats
+    const maxSelectableSeats = Math.floor(totalSeats * 0.1); // 10% of total seats
+
+    setSelectedSeats((prev) => {
+      if (prev.includes(seatId)) {
+        // Deselect the seat
+        return prev.filter((id) => id !== seatId);
+      } else {
+        // Prevent selecting more than the limit if isUpcoming is true
+        if (
+          isUpcoming &&
+          prev.length + occupiedSeats.length >= maxSelectableSeats
+        ) {
+          alert(
+            `You can only select up to ${maxSelectableSeats} seats for this upcoming show.`
+          );
+          return prev;
+        }
+        // Select the seat
+        return [...prev, seatId];
+      }
+    });
   };
 
   // Determines seat color based on its status
@@ -163,42 +180,41 @@ const Tickets = () => {
     }
   }, [showtimes]);
 
-
   if (error) return <div className="">{error}</div>;
 
   return (
     <div className="tickets-page">
-      <LoadingSpinner isLoading={loading || showtimeLoading || seatsLoading} /> 
+      <LoadingSpinner isLoading={loading || showtimeLoading || seatsLoading} />
       <Container maxWidth="md" sx={{ my: 4 }}>
         <Typography variant="h4" gutterBottom className="tickets-title">
           Get your Tickets
         </Typography>
 
         <Paper elevation={3} className="booking-form">
-        <Box className="selection-container">
+          <Box className="selection-container">
             <LocalMovies className="selection-icon" />
             <FormControl fullWidth>
               <Typography variant="subtitle1">Select Movie</Typography>
               <Autocomplete
                 value={selectedMovie}
                 onChange={(event, newValue) => setSelectedMovie(newValue)}
-                options={movies?.map(movie => movie.title) || []}
+                options={movies?.map((movie) => movie.title) || []}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     placeholder="Search movies..."
                     variant="outlined"
                     sx={{
-                      backgroundColor: 'white',
-                      borderRadius: '4px',
+                      backgroundColor: "white",
+                      borderRadius: "4px",
                     }}
                   />
                 )}
                 sx={{
-                  '& .MuiAutocomplete-input': {
-                    height: '1.4375em',
-                    padding: '8.5px 14px !important',
-                  }
+                  "& .MuiAutocomplete-input": {
+                    height: "1.4375em",
+                    padding: "8.5px 14px !important",
+                  },
                 }}
                 autoHighlight
                 openOnFocus
@@ -206,7 +222,7 @@ const Tickets = () => {
               />
             </FormControl>
           </Box>
-          
+
           <Box className="selection-container">
             <CalendarMonth className="selection-icon" />
             <FormControl fullWidth>

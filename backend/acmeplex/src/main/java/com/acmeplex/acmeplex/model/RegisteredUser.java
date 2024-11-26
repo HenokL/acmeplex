@@ -68,6 +68,13 @@ public class RegisteredUser {
     private String creditCardExpiryDate;
 
     /*
+     * Column for the regstered user membership expiry date
+     * This field is nullable, as not all users may provide an expiry date.
+     */
+    @Column(name = "membershipPurchaseDate", nullable = true)
+    private java.sql.Date membershipPurchaseDate;
+
+    /*
      * Default constructor required by Hibernate for JPA entities.
      * This constructor is used by Hibernate when creating an instance of the RegisteredUser class.
      */
@@ -80,10 +87,12 @@ public class RegisteredUser {
      * @param email The email address of the user
      * @param password The user's password
      */
-    public RegisteredUser(String name, String email, String password) {
+    public RegisteredUser(String name, String email, String password, java.sql.Date membershipPurchaseDate) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.membershipPurchaseDate = membershipPurchaseDate;
+
     }
 
     /*
@@ -179,4 +188,25 @@ public class RegisteredUser {
     public void setCreditCardExpiryDate(String expiryDate) {
         this.creditCardExpiryDate = expiryDate;
     }
+
+
+        /*
+     * Retrieves the user's membership purchase date.
+     * This is a nullable field and may not be available for all users.
+     *
+     * @return The credit card expiry date, or null if not provided
+     */
+    public java.sql.Date getMembershipPurchaseDate() {
+        return this.membershipPurchaseDate;
+    }
+
+    /*
+     * Sets the user's membership purchase date
+     *
+     * @param membershipPurchaseDate the day the membership fee was processed
+     */
+    public void setMembershipPurchaseDate(java.sql.Date membershipPurchaseDate) {
+        this.membershipPurchaseDate = membershipPurchaseDate;
+    }
+
 }

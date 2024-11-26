@@ -11,6 +11,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Optional;
+import java.sql.Date; 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ import java.util.Map;
 public class RegisteredUserController {
 
     private final RegisteredUserService registeredUserService;
+
 
     // Constructor to inject the RegisteredUserService
     public RegisteredUserController(RegisteredUserService registeredUserService) {
@@ -72,10 +75,25 @@ public class RegisteredUserController {
      *         or a 400 (Bad Request) if the email already exists.
      */
     @PostMapping("/users")
-    public ResponseEntity<?> createUser(@RequestBody RegisteredUser user) {
+    public ResponseEntity<?> createUser(@RequestBody Map<String, String> userDetails) {
+        
         try {
+
+            // Parse the JSON request
+            String email = userDetails.get("email");
+            String name = userDetails.get("name");
+            String password = userDetails.get("password");
+
+             // Set the current date as the membership purchase date
+            LocalDate currentDate = LocalDate.now();
+            Date sqlDate = Date.valueOf(currentDate);
+
+            // Save the registeredUser through their constructor
+            RegisteredUser regUser = new RegisteredUser(email, name, password, sqlDate);
+
+
             // Attempt to save the user
-            RegisteredUser savedUser = registeredUserService.saveUser(user);
+            RegisteredUser savedUser = registeredUserService.saveUser(regUser);
 
             // Return the saved user with HTTP status 201 (Created)
             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);

@@ -6,6 +6,11 @@
  * Written by: Henok Lamiso and Yousef Fatouraee
  */
 
+// src/pages/Tickets/Tickets.jsx
+import { useLoading } from '../../hooks/useLoading';
+import LoadingSpinner from '../../components/LoadingSpinner/LoadingSpinner';
+import { Autocomplete, TextField } from "@mui/material"; // We need to import Autocomplete and TextField from @mui/material
+
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useApi } from "../../hooks/useApi";
@@ -32,6 +37,7 @@ import "./Tickets.css";
 const Tickets = () => {
   const location = useLocation();
   const isUpcoming = location?.state?.upcoming || false;
+  const { isLoading, withLoading } = useLoading();
 
   const navigate = useNavigate();
   const [selectedMovie, setSelectedMovie] = useState("");
@@ -157,39 +163,50 @@ const Tickets = () => {
     }
   }, [showtimes]);
 
-  if (loading) return <div>Loading...</div>;
+
   if (error) return <div className="">{error}</div>;
 
   return (
     <div className="tickets-page">
+      <LoadingSpinner isLoading={loading || showtimeLoading || seatsLoading} /> 
       <Container maxWidth="md" sx={{ my: 4 }}>
         <Typography variant="h4" gutterBottom className="tickets-title">
           Get your Tickets
         </Typography>
 
         <Paper elevation={3} className="booking-form">
-          <Box className="selection-container">
+        <Box className="selection-container">
             <LocalMovies className="selection-icon" />
             <FormControl fullWidth>
               <Typography variant="subtitle1">Select Movie</Typography>
-              <Select
+              <Autocomplete
                 value={selectedMovie}
-                onChange={(e) => setSelectedMovie(e.target.value)}
-                displayEmpty
-              >
-                <MenuItem value="" disabled>
-                  Choose a movie
-                </MenuItem>
-                {movies &&
-                  movies.map((movie, key) => (
-                    <MenuItem key={key} value={movie.title}>
-                      {movie.title}
-                    </MenuItem>
-                  ))}
-              </Select>
+                onChange={(event, newValue) => setSelectedMovie(newValue)}
+                options={movies?.map(movie => movie.title) || []}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Search movies..."
+                    variant="outlined"
+                    sx={{
+                      backgroundColor: 'white',
+                      borderRadius: '4px',
+                    }}
+                  />
+                )}
+                sx={{
+                  '& .MuiAutocomplete-input': {
+                    height: '1.4375em',
+                    padding: '8.5px 14px !important',
+                  }
+                }}
+                autoHighlight
+                openOnFocus
+                blurOnSelect
+              />
             </FormControl>
           </Box>
-
+          
           <Box className="selection-container">
             <CalendarMonth className="selection-icon" />
             <FormControl fullWidth>

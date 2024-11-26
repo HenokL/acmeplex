@@ -38,12 +38,16 @@ const Navbar = () => {
             <Link to="/about">About Us</Link>
           </li>
           {localStorage.getItem("email") && (
-            <li>
-              <Link to="/tickets" state={{ upcoming: true }}>
-                Upcoming Shows
-              </Link>
-            </li>
-          )}
+          <li>
+            <Link 
+              to="/tickets" 
+              state={{ upcoming: true }}
+              className="upcoming-movies-btn"
+            >
+              Upcoming Shows
+            </Link>
+          </li>
+        )}
         </ul>
       </div>
 

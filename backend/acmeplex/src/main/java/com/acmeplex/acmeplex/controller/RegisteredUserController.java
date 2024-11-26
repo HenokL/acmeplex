@@ -1,4 +1,5 @@
 package com.acmeplex.controller;
+
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.acmeplex.model.RegisteredUser;
 import com.acmeplex.service.RegisteredUserService;
@@ -13,60 +14,85 @@ import java.util.Optional;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
+/**
+ * RegisteredUserController handles HTTP requests related to registered user data.
+ * It includes endpoints for retrieving all registered users, a specific user by email,
+ * creating a new user, and logging in a user.
+ * Author: Riley Koppang
+ */
 @RestController
 @RequestMapping("/api")
 public class RegisteredUserController {
 
-    
     private final RegisteredUserService registeredUserService;
 
+    // Constructor to inject the RegisteredUserService
     public RegisteredUserController(RegisteredUserService registeredUserService) {
         this.registeredUserService = registeredUserService;
     }
 
-    // Retrieves a list of all movies
+    /**
+     * Retrieves a list of all registered users.
+     * 
+     * @return A ResponseEntity containing the list of all users with HTTP status 200 (OK).
+     */
     @GetMapping("/users")
     public ResponseEntity<List<RegisteredUser>> getAllRegisteredUsers() {
-         // Get all movies from the service
-         List<RegisteredUser> users = registeredUserService.getAllRegisteredUsers();
-         
-        // Return the list of movies with HTTP status 200 (OK)
-        return ResponseEntity.ok(users); 
+        // Get all registered users from the service
+        List<RegisteredUser> users = registeredUserService.getAllRegisteredUsers();
+        
+        // Return the list of users with HTTP status 200 (OK)
+        return ResponseEntity.ok(users);
     }
 
-    // Retrieves user by specific email
+    /**
+     * Retrieves a specific registered user by their email.
+     * 
+     * @param email The email of the user.
+     * @return A ResponseEntity containing the user data if found, or HTTP status 404 (Not Found) if not found.
+     */
     @GetMapping("/users/{email}")
     public ResponseEntity<RegisteredUser> getUserByEmail(@PathVariable("email") String email) {
         Optional<RegisteredUser> user = registeredUserService.getUserByEmail(email);
 
         if (user.isPresent()) {
-            // Return the movie with OK if found
+            // Return the user with HTTP status 200 (OK) if found
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
         } else {
-            //  Return 404 not found if the movie does not exist
+            // Return HTTP status 404 (Not Found) if the user does not exist
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-     // Store a new registered user
-     @PostMapping("/users")
-     public ResponseEntity<?> createUser(@RequestBody RegisteredUser user) {
-         try {
-             // Attempt to save the user
-             RegisteredUser savedUser = registeredUserService.saveUser(user);
-     
-             // Return the saved user with HTTP status 201 (Created)
-             return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
-     
-         } catch (Exception ex) {
-             // Handle all exceptions and return a simple error message
-             return new ResponseEntity<>("Duplicate Email Try Again", HttpStatus.BAD_REQUEST);
-         }
-     }
-     
-     //  Login in a user
+    /**
+     * Creates a new registered user.
+     * 
+     * @param user The user object to be saved.
+     * @return A ResponseEntity containing the saved user with HTTP status 201 (Created),
+     *         or a 400 (Bad Request) if the email already exists.
+     */
+    @PostMapping("/users")
+    public ResponseEntity<?> createUser(@RequestBody RegisteredUser user) {
+        try {
+            // Attempt to save the user
+            RegisteredUser savedUser = registeredUserService.saveUser(user);
+
+            // Return the saved user with HTTP status 201 (Created)
+            return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+
+        } catch (Exception ex) {
+            // Handle all exceptions, such as duplicate email, and return a simple error message
+            return new ResponseEntity<>("Duplicate Email Try Again", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Logs in a registered user.
+     * 
+     * @param loginDetails A map containing email and password for login.
+     * @return A ResponseEntity containing a success or error message along with user data
+     *         or an error message depending on the login success or failure.
+     */
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, String> loginDetails) {
         String email = loginDetails.get("email");
@@ -82,18 +108,24 @@ public class RegisteredUserController {
             if (user.getPassword().equals(password)) {
                 Map<String, String> response = new HashMap<>();
                 response.put("message", "Login successful");
-                response.put("userId", String.valueOf(user.getUserId())); // Assuming the user has an ID field
+                response.put("userId", String.valueOf(user.getUserId()));
+                response.put("creditCardNumber", user.getCreditCardNumber());
+                response.put("creditCardCVV", user.getCreditCardCVV());
+                response.put("creditCardExpiryDate", user.getCreditCardExpiryDate());
+
+                // Return login success message with user details
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
+                // Return HTTP status 400 (Bad Request) if the password is incorrect
                 Map<String, String> response = new HashMap<>();
                 response.put("message", "Invalid password");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
         } else {
+            // Return HTTP status 404 (Not Found) if the user does not exist
             Map<String, String> response = new HashMap<>();
             response.put("message", "User not found");
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
-    
 }

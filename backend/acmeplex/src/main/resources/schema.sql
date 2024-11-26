@@ -1,13 +1,10 @@
 -- Drop the tables in reverse order of dependencies
 
-set FOREIGN_KEY_CHECKS = 0;
-
-
 -- Creates the database tables
 CREATE DATABASE IF NOT EXISTS acmeplex;
 USE acmeplex;
 
--- set FOREIGN_KEY_CHECKS = 1;
+set FOREIGN_KEY_CHECKS = 0;
 
 -- Drop tables if they exist to ensure a fresh start
 DROP TABLE IF EXISTS Receipt;
@@ -43,17 +40,22 @@ CREATE TABLE IF NOT EXISTS RegisteredUser (
     userId INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255),
     email VARCHAR(255) UNIQUE,
-    password VARCHAR(255)
+    password VARCHAR(255),
+    creditCardNumber VARCHAR(16),
+    creditCardCVV VARCHAR(3),
+    creditCardExpiryDate VARCHAR(5)
 );
 
 -- Creates the Payment table if it doesn't already exist
 CREATE TABLE IF NOT EXISTS Payment (
     paymentId INT AUTO_INCREMENT PRIMARY KEY,
     amount DOUBLE,
-    creditCardNumber BIGINT,
+    creditCardNumber VARCHAR(16),
     creditCardName VARCHAR(255),
-    creditCardCV INT,
-    paymentDate DATE
+    creditCardCV VARCHAR(3),
+    creditCardExpiryDate VARCHAR(5),
+    paymentDate DATE,
+    creditsUsed DOUBLE DEFAULT 0.0
 );
 
 -- Creates the Ticket table if it doesn't already exist
@@ -156,25 +158,26 @@ INSERT INTO Showtime (movieId, startTime, endTime, showtimeDate) VALUES
 (30, '17:00:00', '19:30:00', '2025-06-02');
 
 -- Insert data into the RegisteredUser table
-INSERT INTO RegisteredUser (name, email, password) VALUES
-('John Doe', 'john.doe@example.com', 'password123'),
-('Jane Smith', 'jane.smith@example.com', 'securePass!'),
-('Emily Johnson', 'emily.johnson@example.com', 'myPassword2024'),
-('Michael Brown', 'michael.brown@example.com', '12345abcde'),
-('Sarah Davis', 'sarah.davis@example.com', 'password!@#'),
-('David Wilson', 'david.wilson@example.com', 'P@ssw0rd123'),
-('Olivia Moore', 'olivia.moore@example.com', 'password456'),
-('James Taylor', 'james.taylor@example.com', '123abc456'),
-('Sophia Lee', 'sophia.lee@example.com', 'securepassword789'),
-('Lucas Harris', 'lucas.harris@example.com', 'qwertyuiop');
+INSERT INTO RegisteredUser (name, email, password, creditCardNumber, creditCardCVV, creditCardExpiryDate) VALUES
+('John Doe', 'john.doe@example.com', 'password123', '1234567881111111', '112', '08/23'),
+('Jane Smith', 'jane.smith@example.com', 'securePass!', NULL, NULL, NULL),
+('Emily Johnson', 'emily.johnson@example.com', 'myPassword2024', NULL, NULL, NULL),
+('Michael Brown', 'michael.brown@example.com', '12345abcde', NULL, NULL, NULL),
+('Sarah Davis', 'sarah.davis@example.com', 'password!@#', NULL, NULL, NULL),
+('David Wilson', 'david.wilson@example.com', 'P@ssw0rd123', NULL, NULL, NULL),
+('Olivia Moore', 'olivia.moore@example.com', 'password456', NULL, NULL, NULL),
+('James Taylor', 'james.taylor@example.com', '123abc456', NULL, NULL, NULL),
+('Sophia Lee', 'sophia.lee@example.com', 'securepassword789', NULL, NULL, NULL),
+('Riley Koppang', 'rileykoppang@gmail.com', '123', "1111111111111111", "123", "11/25"),
+('Lucas Harris', 'lucas.harris@example.com', 'qwertyuiop', NULL, NULL, NULL);
 
 -- Insert data into the Payment table
 INSERT INTO Payment (amount, creditCardNumber, creditCardName, creditCardCV, paymentDate) VALUES
-(100.50, 1234567890123456, 'John Doe', 123, '2024-11-16'),
-(250.75, 9876543210987654, 'Jane Smith', 456, '2024-11-15'),
-(150.00, 1122334455667788, 'Emily Johnson', 789, '2024-11-14'),
-(320.25, 2233445566778899, 'Michael Brown', 101, '2024-11-13'),
-(200.50, 3344556677889900, 'Sarah Davis', 202, '2024-11-12');
+(100.50, "1234567890123456", 'John Doe', "123", '2024-11-16'),
+(250.75, "9876543210987654", 'Jane Smith', "456", '2024-11-15'),
+(150.00, "1122334455667788", 'Emily Johnson', "789", '2024-11-14'),
+(320.25, "2233445566778899", 'Michael Brown', "101", '2024-11-13'),
+(200.50, "3344556677889900", 'Sarah Davis', "202", '2024-11-12');
 
 -- Insert data into the Ticket table
 INSERT INTO Ticket (email, price, status, purchaseDate, movieId, showtimeId) VALUES
@@ -213,4 +216,7 @@ INSERT INTO Credit (email, creditAmount, issuedDate) VALUES
 ('jane.smith@example.com', 200.0, '2024-11-11'),
 ('emily.johnson@example.com', 150.0, '2024-11-12'),
 ('michael.brown@example.com', 300.0, '2024-11-13'),
-('sarah.davis@example.com', 250.0, '2024-11-14');
+('sarah.davis@example.com', 250.0, '2024-11-14'),
+('rileykoppang@gmail.com', 5.0, '2024-11-14');
+
+set FOREIGN_KEY_CHECKS = 1;

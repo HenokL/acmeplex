@@ -13,6 +13,11 @@ import java.util.Date;
 import java.util.List;
 
 
+/**
+ * This class represents a Movie entity, which maps to the "Movie" table in the database.
+ * It contains details about a movie, such as its title, duration, genre, and associated showtimes.
+ * Author: Riley Koppang
+ */
 @Entity
 @Table(name = "Movie")
 public class Movie {
@@ -61,7 +66,11 @@ public class Movie {
     public Movie() {}
 
     /*
-     * Parameterized constructor
+     * Parameterized constructor to create a Movie instance with specific details.
+     *
+     * @param title The title of the movie
+     * @param duration The duration of the movie in minutes
+     * @param genre The genre of the movie
      */
     public Movie(String title, double duration, String genre) {
         this.title = title;
@@ -69,8 +78,10 @@ public class Movie {
         this.genre = genre;
     }
 
-    /*
-     * Gets the ID value of the movie
+     /*
+     * Gets the ID value of the movie.
+     *
+     * @return The unique movie ID
      */
     public int getId() {
         return movieId;
@@ -81,63 +92,75 @@ public class Movie {
     }
 
     /*
-     * Sets the ID value of the movie
+     * Sets the ID value of the movie.
+     *
+     * @param movieId The unique movie ID
      */
     public void setId(int movieId) {
         this.movieId = movieId;
     }
 
     /*
-     * Gets the title of the movie
+     * Gets the title of the movie.
+     *
+     * @return The title of the movie
      */
     public String getTitle() {
         return title;
     }
 
     /*
-     * Sets the title of the movie
+     * Sets the title of the movie.
+     *
+     * @param title The title of the movie
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
     /*
-     * Gets the director of the movie
+     * Gets the duration of the movie.
+     *
+     * @return The duration of the movie in minutes
      */
     public double getDuration() {
         return duration;
     }
 
     /*
-     * Sets the director of the movie
+     * Sets the duration of the movie.
+     *
+     * @param duration The duration of the movie in minutes
      */
     public void setDuration(Double duration) {
         this.duration = duration;
     }
 
+    /*
+     * Gets the genre of the movie.
+     *
+     * @return The genre of the movie
+     */
     public String getGenre() {
         return genre;
     }
 
-    /*
-     * Sets the genre of the movie
+     /*
+     * Sets the genre of the movie.
+     *
+     * @param genre The genre of the movie
      */
     public void setGenre(String genre) {
         this.genre = genre;
     }
 
     /*
-     * Returns the list of showtimes for the movie
+     * Returns the list of showtimes for the movie.
+     * This is a one-to-many relationship, so each movie can have multiple showtimes.
+     *
+     * @return A list of Showtime objects associated with the movie
      */
     public List<Showtime> getShowtimes() {
         return showtimes;
-    }
-     
-    /*
-     * Override toString for better object representation
-     */
-    @Override
-    public String toString() {
-        return "Movie{movieId=" + movieId + ", title='" + title + "'}";
     }
 }

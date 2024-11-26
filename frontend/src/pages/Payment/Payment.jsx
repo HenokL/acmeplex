@@ -5,8 +5,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
-// Here I am importing a components from Material UI
 import {
   Container,
   Paper,
@@ -16,9 +14,9 @@ import {
   Box,
   Grid,
   Divider,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
-
-// Here I am importing some icons from Material UI
 import {
   Person,
   Email,
@@ -29,20 +27,23 @@ import {
   LocalMovies,
   Receipt,
 } from "@mui/icons-material";
-
 import Footer from "../../components/Footer/Footer";
 import "./Payment.css";
 import { useApi } from "../../hooks/useApi";
 
-// This will Renders payment form and order summary, handles payment processing
+
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const ticketData = location.state?.ticketData;
+  
+  console.log("Ticket Data:", ticketData);
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [submittedOnce, setSubmittedOnce] = useState(false);
   const [isGuest, setIsGuest] = useState(true);
+  const [showPaymentSection, setShowPaymentSection] = useState(false);
+  const [useCreditsForPayment, setUseCreditsForPayment] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -51,6 +52,7 @@ const Payment = () => {
     expiryDate: "",
     cvv: "",
   });
+
   const {
     data,
     loading,
@@ -58,14 +60,16 @@ const Payment = () => {
     responseStatus,
     fetchData: book,
   } = useApi("api/tickets/book", "POST");
+
   const {
     data: credit,
     loading: creditLoading,
     error: creditError,
   } = useApi(
-    localStorage.getItem("email") ? `api/credits/${formData.email}` : "",
+    formData.email ? `api/credits/${formData.email}` : "",
     "GET"
   );
+
   const {
     data: deductedCredit,
     loading: deductCreditLoading,
@@ -81,247 +85,213 @@ const Payment = () => {
       [name]: value,
     }));
   };
-  // Form validation function
-  const validateForm = () => {
-    const errors = {};
 
+  const validatePersonalInfo = () => {
+    const errors = {};
     if (!formData.fullName) {
       errors.fullName = "Full Name is required.";
     }
-
     if (!formData.email) {
       errors.email = "Email is required.";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = "Email address is invalid.";
     }
-
-    if (!formData.cardNumber) {
-      errors.cardNumber = "Card Number is required.";
-    } else if (!/^\d{16}$/.test(formData.cardNumber)) {
-      errors.cardNumber = "Card Number must be 16 digits.";
-    }
-
-    if (!formData.expiryDate) {
-      errors.expiryDate = "Expiry Date is required.";
-    } else if (!/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
-      errors.expiryDate = "Expiry Date format is invalid. Use MM/YY.";
-    }
-
-    if (!formData.cvv) {
-      errors.cvv = "CVV is required.";
-    } else if (!/^\d{3}$/.test(formData.cvv)) {
-      errors.cvv = "CVV must be 3 digits.";
-    }
-
-    setValidationErrors(errors);
-    return Object.keys(errors).length === 0;
+    return errors;
   };
 
-  // Revalidate form when formData changes
-  useEffect(() => {
-    // Only validate the form if not all fields are empty
-    if (
-      Object.values(formData).some((value) => value.trim() !== "") &&
-      submittedOnce
-    ) {
-      validateForm();
-    }
-  }, [formData]);
+  const validatePaymentInfo = () => {
+    const errors = {};
+    if (!useCreditsForPayment) {
+      if (!formData.cardNumber) {
+        errors.cardNumber = "Card Number is required.";
+      } else if (!/^\d{16}$/.test(formData.cardNumber)) {
+        errors.cardNumber = "Card Number must be 16 digits.";
+      }
 
-  // Handle email box appearance
-  useEffect(() => {
-    const storedEmail = localStorage.getItem("email");
-    if (storedEmail) {
-      setIsGuest(false);
-      // Set email from localStorage if available
-      setFormData((prev) => ({
-        ...prev,
-        email: storedEmail,
-      }));
-    }
-  }, []);
+      if (!formData.expiryDate) {
+        errors.expiryDate = "Expiry Date is required.";
+      } else if (!/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
+        errors.expiryDate = "Expiry Date format is invalid. Use MM/YY.";
+      }
 
-  // Handle data submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmittedOnce(true); // to prevent form validation when form is not submitted yet
-    if (!validateForm()) {
+      if (!formData.cvv) {
+        errors.cvv = "CVV is required.";
+      } else if (!/^\d{3}$/.test(formData.cvv)) {
+        errors.cvv = "CVV must be 3 digits.";
+      }
+    }
+    return errors;
+  };
+
+  const handlePersonalInfoSubmit = async () => {
+    const errors = validatePersonalInfo();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
       return;
     }
-    const ticketData = location.state.ticketData;
 
-    // Submit credit deduction for registered users
-    if (!isGuest) {
-      try {
-        // Call the book API
-        const { result, status, error } = await deductCredit({
-          headers: { "Content-Type": "application/json" },
-          body: {
-            email: localStorage.getItem("email"),
-            creditsUsed: Math.min(ticketData.total * 1.05, credit),
-          },
-        });
-        // Handle response based on status
-        if (status === 200) {
-          if (result) {
-            // Redirect to the home page
-            console.log(result);
-            setError(result);
-          } else {
-            console.warn("No data returned by the API.");
-          }
-        } else if (status === 400) {
-          // this should be "Insufficient credits. Current balance: 0.0" error!
-          setError(error);
-        } else if (status === 404) {
-          setError(error);
-          return;
-        } else {
-          setError(error || "Please try again later!");
-          return;
-        }
-      } catch (err) {
-        console.error("Error during login:", err);
-        setError(
-          "An unexpected error occurred. Please check your network connection and try again."
-        );
-        return;
-      }
-    }
-
-    // Submit ticket creation
     try {
-      const requestBody = {
-        showtimeId: ticketData.showtimeId,
-        price: Math.max(ticketData?.total * 1.05 - credit, 0), // Ensure price is a float
-        seats: ticketData.seats,
-        creditCardNumber: parseInt(formData.cardNumber), // Ensure creditCardNumber is an int
-        creditCardName: formData.fullName,
-        creditCardCV: parseInt(formData.cvv, 10), // Ensure creditCardCV is an int
-        email: formData.email,
-      };
-      // Call the book API
-      const { result, status, error } = await book({
-        headers: { "Content-Type": "application/json" },
-        body: requestBody,
-      });
-      // Handle response based on status
-      if (status === 201) {
-        if (result) {
-          // Redirect to the home page
-          const ticketData = {
-            ...location.state.ticketData, // Keep the existing properties
-            ticketId: result, // Add the new ticketId key-value pair
-          };
-          navigate("/confirmation", {
-            state: {
-              ticketData,
-            },
-          });
-        } else {
-          console.warn("No data returned by the API.");
-        }
-      } else if (status === 404) {
-        setError(error);
-      } else {
-        setError(error || "Please try again later!");
+      const response = await fetch(`/api/credits/${formData.email}`);
+      const creditData = await response.json();
+      if (creditData > 0) {
+        setUseCreditsForPayment(true);
       }
-    } catch (err) {
-      console.error("Error during login:", err);
-      setError(
-        "An unexpected error occurred. Please check your network connection and try again."
-      );
+      setShowPaymentSection(true);
+    } catch (error) {
+      console.error("Error checking credits:", error);
+      setShowPaymentSection(true);
     }
   };
 
-  const isFormValid = () => {
-    return Object.values(formData).every((value) => value.trim() !== "");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmittedOnce(true);
+  
+    const errors = {
+      ...validatePersonalInfo(),
+      ...validatePaymentInfo(),
+    };
+  
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+  
+    try {
+      const totalAmount = ticketData.total * 1.05;
+  
+      if (useCreditsForPayment) {
+        // Handle credit payment
+        const creditDeductionResult = await deductCredit({
+          headers: { "Content-Type": "application/json" },
+          body: {
+            email: formData.email,
+            creditsUsed: Math.min(credit, totalAmount)
+          }
+        });
+  
+        if (creditDeductionResult.status === 200) {
+          // Here I set it to Generate the ticket number (1-99)
+          const ticketNumber = Math.floor(Math.random() * 99) + 1;
+          
+          navigate("/confirmation", {
+            state: {
+              ticketData: {
+                ...ticketData,
+                ticketId: ticketNumber,
+                paymentMethod: 'CREDITS',
+                amountPaid: Math.min(credit, totalAmount)
+              }
+            }
+          });
+          return;
+        } else {
+          setError("Failed to process credit payment");
+          return;
+        }
+      }
+  
+      // Handle card payment
+      const requestBody = {
+        showtimeId: Number(ticketData.showtimeId),
+        price: totalAmount,
+        seats: ticketData.seats,
+        creditCardNumber: parseInt(formData.cardNumber),
+        creditCardName: formData.fullName,
+        creditCardCV: parseInt(formData.cvv, 10),
+        email: formData.email
+      };
+
+      const { result, status, error } = await book({
+        headers: { "Content-Type": "application/json" },
+        body: requestBody
+      });
+  
+      if (status === 201) {
+        navigate("/confirmation", {
+          state: {
+            ticketData: {
+              ...ticketData,
+              ticketId: result,
+              paymentMethod: 'CARD',
+              amountPaid: totalAmount
+            }
+          }
+        });
+      } else {
+        setError(error || "Payment failed");
+      }
+  
+    } catch (err) {
+      console.error("Payment error:", err);
+      setError("An unexpected error occurred");
+    }
   };
 
   return (
     <div className="payment-page">
       <Container maxWidth="md" sx={{ my: 4 }}>
-        <Typography variant="h4" gutterBottom className="payment-title">
+        <Typography variant="h4" gutterBottom>
           Complete Your Purchase
         </Typography>
 
         <Grid container spacing={3}>
-          {/* Receipt Summary */}
+          {/* Receipt Section */}
           <Grid item xs={12} md={4}>
             <Paper elevation={3} className="receipt-section">
-              <Typography variant="h6" className="receipt-header">
-                <Receipt sx={{ mr: 1 }} />
+              <Typography variant="h6" gutterBottom>
                 Order Summary
               </Typography>
-              <Divider />
 
-              <Box className="receipt-details">
-                <Box className="receipt-item">
-                  <LocalMovies />
-                  <Typography variant="body1">{ticketData?.movie}</Typography>
-                </Box>
-                <Box className="receipt-item">
-                  <EventNote />
-                  <Typography variant="body1">{ticketData?.date}</Typography>
-                </Box>
-                <Box className="receipt-item">
-                  <AccessTime />
-                  <Typography variant="body1">{ticketData?.time}</Typography>
-                </Box>
-                <Box className="receipt-item">
-                  <TheaterComedy />
-                  <Typography variant="body1">{ticketData?.theater}</Typography>
-                </Box>
+              <Box className="receipt-item">
+              <LocalMovies />
+              <Typography variant="body1">{ticketData?.movie}</Typography>
+            </Box>
 
-                <Divider sx={{ my: 2 }} />
-
-                <Box className="receipt-item">
-                  <Typography variant="body1">Selected Seats:</Typography>
-                  <Typography variant="body1">
-                    {ticketData?.seatsAlphabetic.join(", ")}
-                  </Typography>
-                </Box>
-
-                <Divider sx={{ my: 2 }} />
-
-                {/* GST Calculation */}
-                <Box className="receipt-item">
-                  <Typography variant="body1">GST (5%):</Typography>
-                  <Typography variant="body1">
-                    ${((ticketData?.total || 0) * 0.05).toFixed(2)}
-                  </Typography>
-                </Box>
-
-                <Divider sx={{ my: 2 }} />
-
-                {/* Available Credit for registered users */}
-                {!isGuest && (
-                  <Box className="receipt-item">
-                    <Typography variant="body1">Available Credit:</Typography>
-                    {creditLoading ? (
-                      <Typography variant="body1">Loading...</Typography>
-                    ) : creditError ? (
-                      <Typography variant="body1" color="error">
-                        Error loading credit
-                      </Typography>
-                    ) : (
-                      <Typography variant="body1">${credit || 0}</Typography>
-                    )}
-                  </Box>
-                )}
-
-                {/* Updated Total with GST */}
-                <Box className="receipt-total">
-                  <Typography variant="h6">Total:</Typography>
-                  <Typography variant="h6">
-                    ${Math.max(ticketData?.total * 1.05 - credit, 0)}
-                  </Typography>
-                </Box>
+              <Box className="receipt-item">
+                <TheaterComedy />
+                <Typography>Theater {ticketData?.theater}</Typography>
+              </Box>
+              <Box className="receipt-item">
+                <EventNote />
+                <Typography>{ticketData?.date}</Typography>
+              </Box>
+              <Box className="receipt-item">
+                <AccessTime />
+                <Typography>{ticketData?.time}</Typography>
+              </Box>
+              <Box className="receipt-item">
+              <Receipt />
+              <Typography>
+                Seats: {
+                  ticketData?.seats?.map(seat => 
+                    typeof seat === 'object' ? seat.seatNumber || seat.label : seat
+                  ).join(", ")
+                }
+              </Typography>
+            </Box>
+              <Divider sx={{ my: 2 }} />
+              <Box className="receipt-total">
+                <Typography variant="subtitle1">Subtotal:</Typography>
+                <Typography variant="subtitle1">${ticketData?.total.toFixed(2)}</Typography>
+              </Box>
+              <Box className="receipt-total">
+                <Typography variant="subtitle1">Service Fee (5%):</Typography>
+                <Typography variant="subtitle1">
+                  ${(ticketData?.total * 0.05).toFixed(2)}
+                </Typography>
+              </Box>
+              <Box className="receipt-total">
+                <Typography variant="h6">Total:</Typography>
+                <Typography variant="h6">
+                  ${(ticketData?.total * 1.05).toFixed(2)}
+                </Typography>
               </Box>
             </Paper>
           </Grid>
+          
 
-          {/* Payment Form */}
+          {/* Payment Form Section */}
           <Grid item xs={12} md={8}>
             <Paper elevation={3} className="payment-form">
               <form onSubmit={handleSubmit}>
@@ -337,87 +307,130 @@ const Payment = () => {
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    required
                     error={!!validationErrors.fullName}
                     helperText={validationErrors.fullName}
+                    required
                   />
                 </Box>
-                {isGuest && (
-                  <Box className="form-field">
-                    <Email className="field-icon" />
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      required
-                      error={!!validationErrors.email}
-                      helperText={validationErrors.email}
-                    />
-                  </Box>
-                )}
-
-                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                  Payment Details
-                </Typography>
 
                 <Box className="form-field">
-                  <CreditCard className="field-icon" />
+                  <Email className="field-icon" />
                   <TextField
                     fullWidth
-                    label="Card Number"
-                    name="cardNumber"
-                    value={formData.cardNumber}
+                    label="Email"
+                    name="email"
+                    type="email"
+                    value={formData.email}
                     onChange={handleInputChange}
+                    error={!!validationErrors.email}
+                    helperText={validationErrors.email}
                     required
-                    error={!!validationErrors.cardNumber}
-                    helperText={validationErrors.cardNumber}
+                    disabled={!isGuest}
                   />
                 </Box>
+                
 
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <TextField
+                {!showPaymentSection && (
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={handlePersonalInfoSubmit}
+                    className="continue-button"
+                    sx={{
+                      backgroundColor: '#032541 !important',
+                      '&:hover': {
+                        backgroundColor: '#043658 !important',
+                      }
+                    }}
+                  >
+                    Continue to Payment
+                  </Button>
+                )}
+
+                {showPaymentSection && (
+                  <>
+                    {credit > 0 && (
+                      <Box sx={{ my: 2 }}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={useCreditsForPayment}
+                              onChange={(e) => setUseCreditsForPayment(e.target.checked)}
+                            />
+                          }
+                          label={`Use Available Credits ($${credit})`}
+                        />
+                      </Box>
+                    )}
+
+                    {(!useCreditsForPayment || credit < ticketData?.total * 1.05) && (
+                      <>
+                        <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
+                          Payment Details
+                        </Typography>
+
+                        <Box className="form-field">
+                          <CreditCard className="field-icon" />
+                          <TextField
+                            fullWidth
+                            label="Card Number"
+                            name="cardNumber"
+                            value={formData.cardNumber}
+                            onChange={handleInputChange}
+                            error={!!validationErrors.cardNumber}
+                            helperText={validationErrors.cardNumber}
+                            required={!useCreditsForPayment}
+                          />
+                        </Box>
+
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <TextField
+                              fullWidth
+                              label="Expiry Date"
+                              name="expiryDate"
+                              placeholder="MM/YY"
+                              value={formData.expiryDate}
+                              onChange={handleInputChange}
+                              error={!!validationErrors.expiryDate}
+                              helperText={validationErrors.expiryDate}
+                              required={!useCreditsForPayment}
+                            />
+                          </Grid>
+                          <Grid item xs={6}>
+                            <TextField
+                              fullWidth
+                              label="CVV"
+                              name="cvv"
+                              type="password"
+                              value={formData.cvv}
+                              onChange={handleInputChange}
+                              error={!!validationErrors.cvv}
+                              helperText={validationErrors.cvv}
+                              required={!useCreditsForPayment}
+                            />
+                          </Grid>
+                        </Grid>
+                      </>
+                    )}
+
+                    {error && (
+                      <Typography color="error" sx={{ mt: 2 }}>
+                        {error}
+                      </Typography>
+                    )}
+
+                    <Button
+                      type="submit"
+                      variant="contained"
                       fullWidth
-                      label="Expiry Date"
-                      name="expiryDate"
-                      placeholder="MM/YY"
-                      value={formData.expiryDate}
-                      onChange={handleInputChange}
-                      required
-                      error={!!validationErrors.expiryDate}
-                      helperText={validationErrors.expiryDate}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="CVV"
-                      name="cvv"
-                      type="password"
-                      value={formData.cvv}
-                      onChange={handleInputChange}
-                      required
-                      error={!!validationErrors.cvv}
-                      helperText={validationErrors.cvv}
-                    />
-                  </Grid>
-                </Grid>
-
-                {/* Display general error message */}
-                {error && <span className="error-message">{error}</span>}
-
-                <Button
-                  type="submit"
-                  variant="contained"
-                  fullWidth
-                  disabled={!isFormValid()}
-                  className="submit-button"
-                >
-                  Make Payment and Get Ticket
-                </Button>
+                      className="submit-button"
+                      sx={{ mt: 3 }}
+                    >
+                      Complete Payment
+                    </Button>
+                  </>
+                )}
               </form>
             </Paper>
           </Grid>
@@ -429,3 +442,4 @@ const Payment = () => {
 };
 
 export default Payment;
+

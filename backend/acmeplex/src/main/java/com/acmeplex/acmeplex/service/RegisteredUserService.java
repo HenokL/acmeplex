@@ -4,8 +4,9 @@ import com.acmeplex.model.RegisteredUser;
 import com.acmeplex.repository.RegisteredUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
 import java.util.List;
+
 import java.util.Optional;
 
 /**
@@ -72,7 +73,8 @@ public class RegisteredUserService {
      * @param creditCardCVV The new credit card CVV.
      * @param creditCardExpiryDate The new credit card expiry date.
      */
-    public void updateCreditCardInfo(String email, String creditCardNumber, String creditCardCVV, String creditCardExpiryDate) {
+    public void updateCreditCardInfo(String email, String creditCardNumber, String creditCardCVV,
+            String creditCardExpiryDate) {
         // Finds the user by email
         Optional<RegisteredUser> userOptional = registeredUserRepository.findByEmail(email);
 
@@ -88,4 +90,39 @@ public class RegisteredUserService {
 
         // If the user is not found, do nothing
     }
+    
+      /**
+     * Check if a user's membership has expired.
+     * Assumes membership expires 1 year after the purchase date.
+     * 
+     * @param email The email of the user.
+     * @return String indicating whether the membership has expired ("true" or "false").
+     */
+    public String hasMembershipExpired(String email) {
+        Optional<RegisteredUser> userOpt = registeredUserRepository.findByEmail(email);
+        
+        if (userOpt.isPresent()) {
+            RegisteredUser user = userOpt.get();
+            
+            // Get the current date and the membership purchase date
+            LocalDate currentDate = LocalDate.now();
+            LocalDate membershipPurchaseDate = user.getMembershipPurchaseDate().toLocalDate();
+            
+            // Assuming membership expires 1 year after purchase date
+            LocalDate expirationDate = membershipPurchaseDate.plusYears(1);
+            
+            // Compare the current date to the expiration date
+            // Returns "true" if the membership is expired
+            if (currentDate.isAfter(expirationDate)) {
+                return "true";
+            } else {
+                return "false";
+            }
+        } else {
+            return "false"; // If user not found, return "false"
+        }
+    }
+
+
+
 }

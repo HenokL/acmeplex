@@ -68,6 +68,36 @@ public class RegisteredUserController {
     }
 
     /**
+     * Updates the membershipPurchaseDate to the current date for the given user.
+     * 
+     * @param email The email of the user whose membershipPurchaseDate needs to be updated.
+     * @return A ResponseEntity indicating whether the update was successful or not.
+     */
+    @PatchMapping("/users/{email}/membership")
+    public ResponseEntity<?> updateMembershipPurchaseDate(@PathVariable("email") String email) {
+        Optional<RegisteredUser> userOpt = registeredUserService.getUserByEmail(email);
+
+        if (userOpt.isPresent()) {
+            RegisteredUser user = userOpt.get();
+
+            // Update the membershipPurchaseDate to the current date
+            LocalDate currentDate = LocalDate.now();
+            Date sqlDate = Date.valueOf(currentDate);
+
+            // Assuming you have a method in your service to update the user
+            user.setMembershipPurchaseDate(sqlDate);
+            registeredUserService.saveUser(user);
+
+            return new ResponseEntity<>("Membership purchase date updated successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+
+
+    /**
      * Creates a new registered user.
      * 
      * @param user The user object to be saved.
@@ -122,6 +152,9 @@ public class RegisteredUserController {
         if (userOpt.isPresent()) {
             RegisteredUser user = userOpt.get();
 
+            // Check if the membership has expired
+            String expired = registeredUserService.hasMembershipExpired(email);
+
             // Check if the password matches (assuming passwords are stored in plain text, for demo purposes)
             if (user.getPassword().equals(password)) {
                 Map<String, String> response = new HashMap<>();
@@ -130,6 +163,7 @@ public class RegisteredUserController {
                 response.put("creditCardNumber", user.getCreditCardNumber());
                 response.put("creditCardCVV", user.getCreditCardCVV());
                 response.put("creditCardExpiryDate", user.getCreditCardExpiryDate());
+                response.put("membershipExpired", expired);
 
                 // Return login success message with user details
                 return new ResponseEntity<>(response, HttpStatus.OK);

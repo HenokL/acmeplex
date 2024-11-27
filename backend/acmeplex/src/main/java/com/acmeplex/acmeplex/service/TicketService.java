@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import java.io.Console;
 import java.util.Date;
 import com.acmeplex.model.Movie;
 import com.acmeplex.model.Seat;
@@ -136,11 +137,20 @@ public class TicketService {
                 .orElseThrow(() -> new EntityNotFoundException("Ticket not found"));
 
         // Retrieve and delete associated seats from the database
+        
         List<Seat> seatsToDelete = ticket.getSeats();
-        seatRepository.deleteAll(seatsToDelete);
+        ticket.getSeats().clear();
+
+        try {
+            seatRepository.deleteAll(seatsToDelete);
+            System.out.println("Seats deleted successfully.");
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting seats", e);
+        }
 
         // Update the ticket status to "Cancelled"
         ticket.setStatus("Cancelled");
+
 
         // Save the updated ticket
         ticketRepository.save(ticket);

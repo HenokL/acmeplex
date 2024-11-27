@@ -76,7 +76,7 @@ public class Ticket {
      * This column represents the seats associated with this ticket.
      * A ticket can have one or more seats depending on the booking.
      */
-    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Seat> seats;
 
     /*

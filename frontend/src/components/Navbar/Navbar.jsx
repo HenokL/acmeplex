@@ -19,7 +19,9 @@ const Navbar = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("name");
     localStorage.removeItem("email");
-
+    localStorage.removeItem("creditCardNumber");
+    localStorage.removeItem("creditCardExpiryDate");
+    localStorage.removeItem("creditCardCVV");
     // Redirect to home page after logout
     navigate("/");
   };
@@ -38,16 +40,16 @@ const Navbar = () => {
             <Link to="/about">About Us</Link>
           </li>
           {localStorage.getItem("email") && (
-          <li>
-            <Link 
-              to="/tickets" 
-              state={{ upcoming: true }}
-              className="upcoming-movies-btn"
-            >
-              Upcoming Shows
-            </Link>
-          </li>
-        )}
+            <li>
+              <Link
+                to="/tickets"
+                state={{ upcoming: true }}
+                className="upcoming-movies-btn"
+              >
+                Upcoming Shows
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
 

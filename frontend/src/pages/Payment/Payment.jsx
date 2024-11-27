@@ -31,13 +31,12 @@ import Footer from "../../components/Footer/Footer";
 import "./Payment.css";
 import { useApi } from "../../hooks/useApi";
 
-
 const Payment = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const ticketData = location.state?.ticketData;
-  
-  console.log("Ticket Data:", ticketData);
+
+  // console.log("Ticket Data:", ticketData);
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [submittedOnce, setSubmittedOnce] = useState(false);
@@ -46,11 +45,11 @@ const Payment = () => {
   const [useCreditsForPayment, setUseCreditsForPayment] = useState(false);
 
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    cardNumber: "",
-    expiryDate: "",
-    cvv: "",
+    fullName: localStorage.getItem("name") || "",
+    email: localStorage.getItem("email") || "",
+    cardNumber: localStorage.getItem("creditCardNumber") || "",
+    expiryDate: localStorage.getItem("creditCardExpiryDate") || "",
+    cvv: localStorage.getItem("creditCardCVV") || "",
   });
 
   const {
@@ -65,18 +64,7 @@ const Payment = () => {
     data: credit,
     loading: creditLoading,
     error: creditError,
-  } = useApi(
-    formData.email ? `api/credits/${formData.email}` : "",
-    "GET"
-  );
-
-  const {
-    data: deductedCredit,
-    loading: deductCreditLoading,
-    error: deductCreditError,
-    responseStatus: deductCreditResponseStatus,
-    fetchData: deductCredit,
-  } = useApi("api/credits/deductCredits", "POST");
+  } = useApi(formData.email ? `api/credits/${formData.email}` : "", "GET");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -146,87 +134,75 @@ const Payment = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmittedOnce(true);
-  
+
     const errors = {
       ...validatePersonalInfo(),
       ...validatePaymentInfo(),
     };
-  
+
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       return;
     }
-  
+
     try {
       const totalAmount = ticketData.total * 1.05;
-  
-      if (useCreditsForPayment) {
-        // Handle credit payment
-        const creditDeductionResult = await deductCredit({
-          headers: { "Content-Type": "application/json" },
-          body: {
-            email: formData.email,
-            creditsUsed: Math.min(credit, totalAmount)
-          }
-        });
-  
-        if (creditDeductionResult.status === 200) {
-          // Here I set it to Generate the ticket number (1-99)
-          const ticketNumber = Math.floor(Math.random() * 99) + 1;
-          
-          navigate("/confirmation", {
-            state: {
-              ticketData: {
-                ...ticketData,
-                ticketId: ticketNumber,
-                paymentMethod: 'CREDITS',
-                amountPaid: Math.min(credit, totalAmount)
-              }
-            }
-          });
-          return;
-        } else {
-          setError("Failed to process credit payment");
-          return;
-        }
-      }
-  
+
       // Handle card payment
+      // Submit ticket creation
       const requestBody = {
         showtimeId: Number(ticketData.showtimeId),
         price: totalAmount,
         seats: ticketData.seats,
-        creditCardNumber: parseInt(formData.cardNumber),
+        creditCardNumber: formData.cardNumber + "",
         creditCardName: formData.fullName,
-        creditCardCV: parseInt(formData.cvv, 10),
-        email: formData.email
+        creditCardCV: formData.cvv + "",
+        email: formData.email,
+        creditsUsed: useCreditsForPayment ? Math.min(credit, totalAmount) : 0,
       };
-
+      // Call the book API
       const { result, status, error } = await book({
         headers: { "Content-Type": "application/json" },
-        body: requestBody
+        body: requestBody,
       });
-  
+      // Handle response based on status
       if (status === 201) {
         navigate("/confirmation", {
           state: {
             ticketData: {
               ...ticketData,
               ticketId: result,
-              paymentMethod: 'CARD',
-              amountPaid: totalAmount
-            }
-          }
+              paymentMethod: "CARD",
+              amountPaid: totalAmount,
+            },
+          },
         });
       } else {
         setError(error || "Payment failed");
       }
-  
     } catch (err) {
       console.error("Payment error:", err);
       setError("An unexpected error occurred");
     }
   };
+
+  // Revalidate form when formData changes
+  useEffect(() => {
+    // Only validate the form if not all fields are empty
+    if (
+      Object.values(formData).some((value) => value.trim() !== "") &&
+      submittedOnce
+    ) {
+      validatePersonalInfo();
+      validatePaymentInfo();
+      const errors = {
+        ...validatePersonalInfo(),
+        ...validatePaymentInfo(),
+      };
+
+      setValidationErrors(errors);
+    }
+  }, [formData]);
 
   return (
     <div className="payment-page">
@@ -244,9 +220,9 @@ const Payment = () => {
               </Typography>
 
               <Box className="receipt-item">
-              <LocalMovies />
-              <Typography variant="body1">{ticketData?.movie}</Typography>
-            </Box>
+                <LocalMovies />
+                <Typography variant="body1">{ticketData?.movie}</Typography>
+              </Box>
 
               <Box className="receipt-item">
                 <TheaterComedy />
@@ -261,19 +237,24 @@ const Payment = () => {
                 <Typography>{ticketData?.time}</Typography>
               </Box>
               <Box className="receipt-item">
-              <Receipt />
-              <Typography>
-                Seats: {
-                  ticketData?.seats?.map(seat => 
-                    typeof seat === 'object' ? seat.seatNumber || seat.label : seat
-                  ).join(", ")
-                }
-              </Typography>
-            </Box>
+                <Receipt />
+                <Typography>
+                  Seats:{" "}
+                  {ticketData?.seats
+                    ?.map((seat) =>
+                      typeof seat === "object"
+                        ? seat.seatNumber || seat.label
+                        : seat
+                    )
+                    .join(", ")}
+                </Typography>
+              </Box>
               <Divider sx={{ my: 2 }} />
               <Box className="receipt-total">
                 <Typography variant="subtitle1">Subtotal:</Typography>
-                <Typography variant="subtitle1">${ticketData?.total.toFixed(2)}</Typography>
+                <Typography variant="subtitle1">
+                  ${ticketData?.total.toFixed(2)}
+                </Typography>
               </Box>
               <Box className="receipt-total">
                 <Typography variant="subtitle1">Service Fee (5%):</Typography>
@@ -289,7 +270,6 @@ const Payment = () => {
               </Box>
             </Paper>
           </Grid>
-          
 
           {/* Payment Form Section */}
           <Grid item xs={12} md={8}>
@@ -328,7 +308,6 @@ const Payment = () => {
                     disabled={!isGuest}
                   />
                 </Box>
-                
 
                 {!showPaymentSection && (
                   <Button
@@ -337,10 +316,10 @@ const Payment = () => {
                     onClick={handlePersonalInfoSubmit}
                     className="continue-button"
                     sx={{
-                      backgroundColor: '#032541 !important',
-                      '&:hover': {
-                        backgroundColor: '#043658 !important',
-                      }
+                      backgroundColor: "#032541 !important",
+                      "&:hover": {
+                        backgroundColor: "#043658 !important",
+                      },
                     }}
                   >
                     Continue to Payment
@@ -355,7 +334,9 @@ const Payment = () => {
                           control={
                             <Switch
                               checked={useCreditsForPayment}
-                              onChange={(e) => setUseCreditsForPayment(e.target.checked)}
+                              onChange={(e) =>
+                                setUseCreditsForPayment(e.target.checked)
+                              }
                             />
                           }
                           label={`Use Available Credits ($${credit})`}
@@ -363,7 +344,8 @@ const Payment = () => {
                       </Box>
                     )}
 
-                    {(!useCreditsForPayment || credit < ticketData?.total * 1.05) && (
+                    {(!useCreditsForPayment ||
+                      credit < ticketData?.total * 1.05) && (
                       <>
                         <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
                           Payment Details
@@ -379,7 +361,10 @@ const Payment = () => {
                             onChange={handleInputChange}
                             error={!!validationErrors.cardNumber}
                             helperText={validationErrors.cardNumber}
-                            required={!useCreditsForPayment}
+                            required={
+                              !useCreditsForPayment ||
+                              credit < ticketData?.total * 1.05
+                            }
                           />
                         </Box>
 
@@ -394,7 +379,10 @@ const Payment = () => {
                               onChange={handleInputChange}
                               error={!!validationErrors.expiryDate}
                               helperText={validationErrors.expiryDate}
-                              required={!useCreditsForPayment}
+                              required={
+                                !useCreditsForPayment ||
+                                credit < ticketData?.total * 1.05
+                              }
                             />
                           </Grid>
                           <Grid item xs={6}>
@@ -407,7 +395,10 @@ const Payment = () => {
                               onChange={handleInputChange}
                               error={!!validationErrors.cvv}
                               helperText={validationErrors.cvv}
-                              required={!useCreditsForPayment}
+                              required={
+                                !useCreditsForPayment ||
+                                credit < ticketData?.total * 1.05
+                              }
                             />
                           </Grid>
                         </Grid>
@@ -442,4 +433,3 @@ const Payment = () => {
 };
 
 export default Payment;
-

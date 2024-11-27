@@ -55,6 +55,15 @@ const Login = () => {
           localStorage.setItem("userId", result.userId || "");
           localStorage.setItem("email", username || "");
           localStorage.setItem("name", result.name || "");
+          localStorage.setItem(
+            "creditCardNumber",
+            result.creditCardNumber || ""
+          );
+          localStorage.setItem(
+            "creditCardExpiryDate",
+            result.creditCardExpiryDate || ""
+          );
+          localStorage.setItem("creditCardCVV", result.creditCardCVV || "");
 
           // Redirect to the home page
           navigate("/");

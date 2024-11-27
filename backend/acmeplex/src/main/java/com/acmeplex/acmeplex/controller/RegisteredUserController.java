@@ -119,7 +119,7 @@ public class RegisteredUserController {
             Date sqlDate = Date.valueOf(currentDate);
 
             // Save the registeredUser through their constructor
-            RegisteredUser regUser = new RegisteredUser(email, name, password, sqlDate);
+            RegisteredUser regUser = new RegisteredUser(name, email, password, sqlDate);
 
 
             // Attempt to save the user

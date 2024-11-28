@@ -19,6 +19,9 @@ import Tickets from './pages/Tickets/Tickets';
 import Payment from './pages/Payment/Payment';
 import Confirmation from './pages/Confirmation/Confirmation';
 
+import MembershipStatus from './components/MembershipStatus/MembershipStatus';
+
+
 function App() {
   return (
     <Router>
@@ -33,6 +36,7 @@ function App() {
           <Route path="/tickets" element={<Tickets />} />
           <Route path="/payment" element={<Payment />} />
           <Route path="/confirmation" element={<Confirmation />} />
+          <Route path="/membershipstatus" element={<MembershipStatus />} />
         </Routes>
       </div>
     </Router>

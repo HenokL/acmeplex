@@ -10,6 +10,7 @@ import Footer from "../../components/Footer/Footer";
 import { useApi } from "../../hooks/useApi";
 import "./Login.css";
 
+
 const Login = () => {
   const navigate = useNavigate(); // Hook to navigate programmatically
   const [username, setUsername] = useState(""); // Username state
@@ -31,6 +32,7 @@ const Login = () => {
    * Redirects users on successful login or displays error messages.
    * @param {Event} e - The form submit event.
    */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Reset any existing error message
@@ -82,6 +84,7 @@ const Login = () => {
       );
     }
   };
+
 
   return (
     <div className="login-page">

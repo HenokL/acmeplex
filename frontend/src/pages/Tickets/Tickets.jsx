@@ -49,6 +49,13 @@ const Tickets = () => {
   const [times, setTimes] = useState([]);
   const [theaters, setTheatre] = useState(["Theater 1"]);
 
+  // Before anything, check if the registered user is allowed to view this page
+
+  if (localStorage.getItem("membershipExpired") == "true") {
+    // Redirect to membership payment page
+    navigate("/membershipstatus");
+  }
+
   const {
     data: movies,
     loading,

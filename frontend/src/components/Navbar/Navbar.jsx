@@ -22,6 +22,7 @@ const Navbar = () => {
     localStorage.removeItem("creditCardNumber");
     localStorage.removeItem("creditCardExpiryDate");
     localStorage.removeItem("creditCardCVV");
+    localStorage.removeItem("membershipExpired");
     // Redirect to home page after logout
     navigate("/");
   };

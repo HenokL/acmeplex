@@ -218,6 +218,6 @@ INSERT INTO Credit (email, creditAmount, issuedDate) VALUES
 ('emily.johnson@example.com', 150.0, '2024-11-12'),
 ('michael.brown@example.com', 300.0, '2024-11-13'),
 ('sarah.davis@example.com', 250.0, '2024-11-14'),
-('rileykoppang@gmail.com', 5.0, '2024-11-14');
+('rileykoppang@gmail.com', 100.0, '2024-11-14');
 
 set FOREIGN_KEY_CHECKS = 1;

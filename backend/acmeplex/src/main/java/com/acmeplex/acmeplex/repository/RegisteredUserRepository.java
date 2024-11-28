@@ -39,4 +39,5 @@ public interface RegisteredUserRepository extends JpaRepository<RegisteredUser, 
      * @return true if a user exists with the given email, false otherwise.
      */
     boolean existsByEmail(String email);
+    
 }

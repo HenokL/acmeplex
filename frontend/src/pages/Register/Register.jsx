@@ -101,6 +101,10 @@ const Register = () => {
           localStorage.setItem("email", result.email || "");
           localStorage.setItem("name", result.name || "");
           localStorage.setItem("userId", result.userId || "");
+          localStorage.setItem(
+            "membershipExpired",
+            result.membershipExpired || "true"
+          );
 
           // Redirect to the home page
           navigate("/");

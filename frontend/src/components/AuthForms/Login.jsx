@@ -10,7 +10,6 @@ import Footer from "../../components/Footer/Footer";
 import { useApi } from "../../hooks/useApi";
 import "./Login.css";
 
-
 const Login = () => {
   const navigate = useNavigate(); // Hook to navigate programmatically
   const [username, setUsername] = useState(""); // Username state
@@ -66,9 +65,17 @@ const Login = () => {
             result.creditCardExpiryDate || ""
           );
           localStorage.setItem("creditCardCVV", result.creditCardCVV || "");
-
-          // Redirect to the home page
-          navigate("/");
+          localStorage.setItem(
+            "membershipExpired",
+            result.membershipExpired || ""
+          );
+          if (result.membershipExpired == "true") {
+            // Redirect to membership payment page
+            navigate("/membershipstatus");
+          } else {
+            // Redirect to the home page
+            navigate("/");
+          }
         } else {
           console.warn("No data returned by the API.");
         }
@@ -84,7 +91,6 @@ const Login = () => {
       );
     }
   };
-
 
   return (
     <div className="login-page">

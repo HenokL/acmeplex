@@ -152,7 +152,7 @@ public ResponseEntity<?> updateMembershipPurchaseDate(
             Date sqlDate = Date.valueOf(currentDate);
 
             // Save the registeredUser through their constructor
-            RegisteredUser regUser = new RegisteredUser(name, email, password, sqlDate);
+            RegisteredUser regUser = new RegisteredUser(name, email, password);
 
 
             // Attempt to save the user

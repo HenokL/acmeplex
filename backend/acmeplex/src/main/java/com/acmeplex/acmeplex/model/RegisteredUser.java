@@ -87,12 +87,10 @@ public class RegisteredUser {
      * @param email The email address of the user
      * @param password The user's password
      */
-    public RegisteredUser(String name, String email, String password, java.sql.Date membershipPurchaseDate) {
+    public RegisteredUser(String name, String email, String password) {
         this.name = name;
         this.email = email;
         this.password = password;
-        this.membershipPurchaseDate = membershipPurchaseDate;
-
     }
 
     /*

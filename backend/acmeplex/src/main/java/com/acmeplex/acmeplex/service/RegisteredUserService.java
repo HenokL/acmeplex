@@ -103,6 +103,11 @@ public class RegisteredUserService {
         
         if (userOpt.isPresent()) {
             RegisteredUser user = userOpt.get();
+
+            // Check if the membershipPurchaseDate is null
+            if (user.getMembershipPurchaseDate() == null) {
+                return "true"; // If no purchase date, membership can't be expired
+            }
             
             // Get the current date and the membership purchase date
             LocalDate currentDate = LocalDate.now();

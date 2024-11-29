@@ -204,7 +204,10 @@ const Tickets = () => {
               <Typography variant="subtitle1">Select Movie</Typography>
               <Autocomplete
                 value={selectedMovie}
-                onChange={(event, newValue) => setSelectedMovie(newValue)}
+                onChange={(event, newValue) => {
+                  setSelectedMovie(newValue);
+                  setSelectedSeats([]);
+                }}
                 options={movies?.map((movie) => movie.title) || []}
                 renderInput={(params) => (
                   <TextField

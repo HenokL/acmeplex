@@ -46,10 +46,7 @@ const MembershipStatus = () => {
     error: apiError,
     responseStatus,
     fetchData: pay,
-  } = useApi(
-    formData.email && `api/users/${formData.email}/membership`,
-    "POST"
-  );
+  } = useApi(formData.email && `api/user/${formData.email}/membership`, "POST");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

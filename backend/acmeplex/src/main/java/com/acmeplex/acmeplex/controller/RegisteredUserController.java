@@ -2,6 +2,8 @@ package com.acmeplex.controller;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.acmeplex.model.RegisteredUser;
+import com.acmeplex.service.PaymentService;
+
 import com.acmeplex.service.RegisteredUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +29,15 @@ import java.util.Map;
 public class RegisteredUserController {
 
     private final RegisteredUserService registeredUserService;
+    private final PaymentService paymentService;
+
+
 
 
     // Constructor to inject the RegisteredUserService
-    public RegisteredUserController(RegisteredUserService registeredUserService) {
+    public RegisteredUserController(RegisteredUserService registeredUserService, PaymentService paymentService) {
         this.registeredUserService = registeredUserService;
+        this.paymentService = paymentService;
     }
 
     /**
@@ -67,32 +73,59 @@ public class RegisteredUserController {
         }
     }
 
-    /**
-     * Updates the membershipPurchaseDate to the current date for the given user.
-     * 
-     * @param email The email of the user whose membershipPurchaseDate needs to be updated.
-     * @return A ResponseEntity indicating whether the update was successful or not.
-     */
-    @PatchMapping("/users/{email}/membership")
-    public ResponseEntity<?> updateMembershipPurchaseDate(@PathVariable("email") String email) {
-        Optional<RegisteredUser> userOpt = registeredUserService.getUserByEmail(email);
+     /**
+ * Updates the membershipPurchaseDate to the current date and credit card info for the given user.
+ * 
+ * @param email The email of the user whose membershipPurchaseDate and credit card info needs to be updated.
+ * @param creditCardInfo The credit card details in JSON format.
+ * @return A ResponseEntity indicating whether the update was successful or not.
+ */
+@PostMapping("user/{email}/membership")
+public ResponseEntity<?> updateMembershipPurchaseDate(
+        @PathVariable("email") String email, 
+        @RequestBody Map<String, String> creditCardInfo) {
 
-        if (userOpt.isPresent()) {
-            RegisteredUser user = userOpt.get();
+    Optional<RegisteredUser> userOpt = registeredUserService.getUserByEmail(email);
 
-            // Update the membershipPurchaseDate to the current date
-            LocalDate currentDate = LocalDate.now();
-            Date sqlDate = Date.valueOf(currentDate);
+    if (userOpt.isPresent()) {
+        RegisteredUser user = userOpt.get();
 
-            // Assuming you have a method in your service to update the user
-            user.setMembershipPurchaseDate(sqlDate);
-            registeredUserService.saveUser(user);
+        // Update the membershipPurchaseDate to the current date
+        LocalDate currentDate = LocalDate.now();
+        Date sqlDate = Date.valueOf(currentDate);
+        user.setMembershipPurchaseDate(sqlDate);
 
-            return new ResponseEntity<>("Membership purchase date updated successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
-        }
+        // Extract values from the Map
+        String creditCardNumber = creditCardInfo.get("creditCardNumber");
+        String creditCardName = creditCardInfo.get("creditCardName");  // Ensure creditCardName is in your JSON
+        String creditCardCVV = creditCardInfo.get("creditCardCVV");
+        String expiryDate = creditCardInfo.get("expiryDate");
+
+        // Set the credit card information
+        user.setCreditCardNumber(creditCardNumber);
+        user.setCreditCardCVV(creditCardCVV);
+        user.setCreditCardExpiryDate(expiryDate);  
+
+        // Pay the annual fee
+        paymentService.createPayment(
+            20.0,                // Amount
+            creditCardNumber,    // Credit card number
+            creditCardName,       // Credit card CVV
+            creditCardCVV,          // Expiry date
+            0.0                  // Credits used
+        );
+
+        // Save the user with updated info
+        registeredUserService.saveUser(user);
+
+        return new ResponseEntity<>("Membership purchase date and credit card information updated successfully", HttpStatus.OK);
+    } else {
+        return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
     }
+}
+
+
+
 
 
 

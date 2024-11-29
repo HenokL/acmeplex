@@ -122,7 +122,4 @@ public class RegisteredUserService {
             return "false"; // If user not found, return "false"
         }
     }
-
-
-
 }

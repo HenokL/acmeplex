@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS RegisteredUser (
     creditCardNumber VARCHAR(16),
     creditCardCVV VARCHAR(3),
     creditCardExpiryDate VARCHAR(5),
-    membershipPurchaseDate DATE NOT NULL
+    membershipPurchaseDate DATE DEFAULT NULL
 );
 
 -- Creates the Payment table if it doesn't already exist
@@ -169,7 +169,7 @@ INSERT INTO RegisteredUser (name, email, password, creditCardNumber, creditCardC
 ('Olivia Moore', 'olivia.moore@example.com', 'password456', NULL, NULL, NULL, '2024-11-20'),
 ('James Taylor', 'james.taylor@example.com', '123abc456', NULL, NULL, NULL, '2024-11-20'),
 ('Sophia Lee', 'sophia.lee@example.com', 'securepassword789', NULL, NULL, NULL, '2024-11-20'),
-('Riley Koppang', 'rileykoppang@gmail.com', '123', "1111111111111111", "123", "11/25", '2024-08-20'),
+('Riley Koppang', 'rileykoppang@gmail.com', '123', "1111111111111111", "123", "11/25", NULL),
 ('Lucas Harris', 'lucas.harris@example.com', 'qwertyuiop', NULL, NULL, NULL, '2024-11-22');
 
 -- Insert data into the Payment table

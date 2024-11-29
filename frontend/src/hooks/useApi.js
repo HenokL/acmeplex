@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 
 export const useApi = (endpoint, method = "GET", options = {}) => {
   // Base URL setup
-  const URL = process.env.BACK_END_URL || "http://localhost";
-  const PORT = process.env.BACK_END_PORT || "8080";
-
+  const URL = process.env.REACT_APP_BACK_END_URL || "http://localhost";
+  const PORT = process.env.REACT_APP_BACK_END_PORT || "8080";
   const [data, setData] = useState(null); // State to store API response data
   const [loading, setLoading] = useState(false); // State to manage loading status
   const [error, setError] = useState(null); // State to store any error messages

@@ -23,11 +23,11 @@ npm install
 ### 3. Configure Environment Variables
 Create a .env file in the root of the project. Use the .env.example file as a template. 
 
-Then add the BACK_END_URL and BACK_END_PORT values.
+Then add the Back-end URL and port values.
 Example:
 ```bash
-BACK_END_URL="http://localhost"
-BACK_END_PORT="8080"
+REACT_APP_BACK_END_URL="http://localhost"
+REACT_APP_BACK_END_PORT="8080"
 ```
 
 ### 4. Start the Development Server

@@ -10,16 +10,20 @@ Make sure you have the following installed:
 
 ### 2. Install Dependencies
 Navigate to the root of the backend project and run the following command to install dependencies:
+ ```bash
 mvn install
+```
 
 
 ### 2. Database configuration
 For the TA/Professor only. We have included the database configuration file in the submission. You will need to update the database configuration to match the correct settings for your environment, such as the database URL, username, and password.
 
 Example:
+ ```bash
   SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/moviedb
   SPRING_DATASOURCE_USERNAME=root
   SPRING_DATASOURCE_PASSWORD=password
+```
 
 
 ## Steps to Set Up the Front End

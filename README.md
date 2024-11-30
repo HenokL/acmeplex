@@ -10,7 +10,6 @@ Make sure you have the following installed:
 
 ### 2. Install Dependencies
 Navigate to the root of the backend project and run the following command to install dependencies:
-```bash
 mvn install
 
 
@@ -21,6 +20,7 @@ Example:
   SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/moviedb
   SPRING_DATASOURCE_USERNAME=root
   SPRING_DATASOURCE_PASSWORD=password
+
 
 ## Steps to Set Up the Front End
 ### 1. Prerequisites

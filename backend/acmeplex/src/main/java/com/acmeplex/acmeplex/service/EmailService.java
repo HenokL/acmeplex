@@ -39,16 +39,16 @@ public class EmailService {
     public void sendEmail(String to, String subject, String body) {
         // Create a new SimpleMailMessage object to represent the email
         SimpleMailMessage message = new SimpleMailMessage();
-        
+
         // Set the 'From' address for the email
         message.setFrom("acmeplex94@gmail.com");
-        
+
         // Set the recipient's address
         message.setTo(to);
-        
+
         // Set the subject of the email
         message.setSubject(subject);
-        
+
         // Set the body of the email
         message.setText(body);
 
@@ -61,4 +61,32 @@ public class EmailService {
             System.err.println("Error sending email: " + e.getMessage());
         }
     }
+
+
+    /**
+     * Sends a cancellation email to the specified recipient.
+     * This method creates an email message with the provided recipient's email address, 
+     * a subject indicating the cancellation, and a body containing information about the ticket cancellation.
+     * It then uses the JavaMailSender to send the email.
+     * 
+     * @param to The recipient's email address (e.g., the user whose ticket has been cancelled).
+     * @param ticketId The unique identifier for the cancelled ticket.
+     */
+    public void sendCancellationEmail(String to, String ticketId) {
+        // Define the subject of the cancellation email
+        String subject = "Ticket Cancellation Confirmation";
+    
+        // Define the body of the cancellation email
+        String body = "Dear User,\n\n"
+                + "We are sorry to inform you that your ticket with ID " + ticketId + " has been successfully cancelled.\n"
+                + "If you have any questions or need assistance, please don't hesitate to contact us.\n\n"
+                + "Best regards,\n"
+                + "The Ticketing Team";
+    
+        // Call the sendEmail method with the provided recipient, subject, and body
+        sendEmail(to, subject, body);
+    }
+    
+
+
 }

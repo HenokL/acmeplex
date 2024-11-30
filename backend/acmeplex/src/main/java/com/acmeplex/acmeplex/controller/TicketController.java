@@ -11,6 +11,7 @@ import com.acmeplex.service.PaymentService;
 import com.acmeplex.service.SeatService;
 import com.acmeplex.service.ReceiptService;
 import com.acmeplex.service.RegisteredUserService;
+import com.acmeplex.service.EmailService;
 import com.acmeplex.service.CreditService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,8 @@ public class TicketController {
     private final ReceiptService receiptService;
     private final RegisteredUserService registeredUserService;
     private final CreditService creditService;
+    private final EmailService emailService;
+
 
     /**
      * Constructor-based dependency injection to initialize required services.
@@ -54,7 +57,7 @@ public class TicketController {
      * @param registeredUserService Service for managing registered user data.
      * @param creditService Service for credit management.
      */
-    public TicketController(TicketService ticketService, ShowtimeService showtimeService, PaymentService paymentService, SeatService seatService, ReceiptService receiptService, RegisteredUserService registeredUserService, CreditService creditService) {
+    public TicketController(TicketService ticketService, ShowtimeService showtimeService, PaymentService paymentService, SeatService seatService, ReceiptService receiptService, RegisteredUserService registeredUserService, CreditService creditService, EmailService emailService) {
         this.ticketService = ticketService;
         this.showtimeService = showtimeService;
         this.paymentService = paymentService;
@@ -62,6 +65,7 @@ public class TicketController {
         this.receiptService = receiptService;
         this.registeredUserService = registeredUserService;
         this.creditService = creditService;
+        this.emailService = emailService;
     }
 
     /**
@@ -132,6 +136,11 @@ public class TicketController {
 
         // Proceed with ticket cancellation
         ticketService.cancelTicket(ticketId, email);
+
+        // Send an email that their ticket is cancelled
+        emailService.sendCancellationEmail(email, String.valueOf(ticketId));
+
+
         return new ResponseEntity<>("Ticket deleted successfully", HttpStatus.OK);
     }
 

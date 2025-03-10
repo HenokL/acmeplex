@@ -14,7 +14,6 @@ Navigate to the root of the backend project and run the following command to ins
 mvn install
 ```
 
-
 ### 2. Database configuration
 For the TA/Professor only. We have included the database configuration file in the submission. You will need to update the database configuration to match the correct settings for your environment, such as the database URL, username, and password.
 
